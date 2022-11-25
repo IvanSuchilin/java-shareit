@@ -27,10 +27,17 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({InvalidEmailException.class, EmailAlreadyExistException.class})
+    @ExceptionHandler({InvalidEmailException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidateParameterException(final RuntimeException e) {
-        log.debug("Упс. Кажется, возникла ошибка {},", e.getMessage());
+    public ErrorResponse handleValidateEmailException(final RuntimeException e) {
+        log.debug("Возникла ошибка {},", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler({EmailAlreadyExistException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleValidateEmailExistException(final RuntimeException e) {
+        log.debug("Возникла ошибка {},", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 

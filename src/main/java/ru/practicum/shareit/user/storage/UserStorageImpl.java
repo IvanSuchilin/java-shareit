@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.storage;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -17,8 +18,8 @@ public class UserStorageImpl implements UserStorage {
     private Map<Long, User> users = new HashMap<>();
 
     @Override
-    public List<User> findAllUsers() {
-        return null;
+    public List<User> getAllUsers() {
+        return new ArrayList<>(users.values());
     }
 
     @Override

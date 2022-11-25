@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.validator;
 
 import exceptions.userExceptions.InvalidEmailException;
 import exceptions.userExceptions.UserEmptyNameException;
