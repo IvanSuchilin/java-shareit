@@ -9,7 +9,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * TODO Sprint add-controllers.
@@ -30,23 +29,21 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public UserDto get(@PathVariable("userId") Long id) {
         log.info("Получение пользователя id {}", id);
-        return null;
+        return userMapper.toDTO(userService.getUserById(id));
     }
 
     @PostMapping("/users")
     public UserDto create(@RequestBody User user) {
         log.info("Создание пользователя");
-        /*UserDto userdto = UserMapper.INSTANCE.toDTO(userService.create(user));*/
-        /*return UserMapper.INSTANCE.toDTO(userService.create(user));*/
-        /*return userService.create(user);*/
         UserDto userDto = userMapper.toDTO(userService.create(user));
         return userDto;
     }
 
-    @PutMapping("/users")
-    public User put(@RequestBody User user) {
-        log.info("Получени евсех пользователей");
-        return userService.update(user);
+    @PatchMapping("/users/{userId}")
+    public UserDto patch(@PathVariable("userId") Long id, @RequestBody UserDto userDto) {
+        log.info("Обновлеие данных пользователя id {}", id);
+        userService.getUserById(id);
+        return userMapper.toDTO(userService.update(id, userDto));
     }
 
     @DeleteMapping("/users/{userId}")
@@ -58,6 +55,6 @@ public class UserController {
     @GetMapping("/users")
     public Collection<User> findAll() {
         log.info("Получение всех пользователей");
-        return userService.findAll();
+        return userService.getAllUsers();
     }
 }

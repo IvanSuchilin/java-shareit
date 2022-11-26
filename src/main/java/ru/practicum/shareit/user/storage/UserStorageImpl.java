@@ -32,22 +32,24 @@ public class UserStorageImpl implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
-        return null;
+    public User update(Long id,UserDto userDto) {
+        if (userDto.getName() != null){
+            users.get(id).setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null){
+            users.get(id).setEmail(userDto.getEmail());
+        }
+        return  users.get(id);
     }
 
     @Override
-    public UserDto findUserById(int userId) {
-        return null;
+    public User getUserById(Long userId) {
+        return users.get(userId);
     }
 
     @Override
-    public void deleteUserById(int userId) {
-
+    public void deleteUserById(Long userId) {
+        users.remove(userId);
     }
 
-    @Override
-    public User update(User user) {
-        return null;
-    }
 }
