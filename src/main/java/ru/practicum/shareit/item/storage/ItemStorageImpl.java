@@ -27,9 +27,12 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public ItemDto createItem(ItemDto itemDto) {
-        return null;
-    }
+    public Item create(Item item) {
+        idMemory++;
+            item.setId(idMemory);
+            items.put(item.getId(), item);
+            return items.get(item.getId());
+        }
 
     @Override
     public ItemDto update(Long id, ItemDto itemDto) {

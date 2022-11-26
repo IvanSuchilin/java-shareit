@@ -22,6 +22,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User create(User user) {
+        log.debug("Получен запрос POST /users");
         userValidator.validateUser(user);
         User newUser = null;
         if (userStorage.getAllUsers().stream().anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
@@ -39,6 +40,7 @@ public class UserService {
     }
 
     public User update(Long id, UserDto userDto) {
+        log.debug("Получен запрос PATCH /users/{userId}");
         if (userDto.getEmail() != null) {
             userDtoValidator.validateUserDto(userDto);
             if (userStorage.getAllUsers().stream().anyMatch(u -> u.getEmail().equals(userDto.getEmail()))) {
@@ -48,15 +50,13 @@ public class UserService {
         return userStorage.update(id, userDto);
     }
 
-    public User getUser(Long id) {
-        return null;
-    }
-
     public void delete(Long id) {
+        log.debug("Получен запрос DELETE /users/{userId}");
         userStorage.deleteUserById(id);
     }
 
     public Collection<User> getAllUsers() {
+        log.debug("Получен запрос GET /users");
         return userStorage.getAllUsers();
     }
 }

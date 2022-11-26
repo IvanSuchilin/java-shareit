@@ -10,7 +10,7 @@ import java.util.List;
 public interface ItemStorage {
     List<Item> getAllItems();
 
-    ItemDto createItem(ItemDto itemDto);
+    Item create(Item item);
 
     ItemDto update(Long id, ItemDto itemDto);
 

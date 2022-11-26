@@ -15,4 +15,10 @@ public class ItemMapperImpl implements  ItemMapper{
         item.getOwner(), item.getRequest());
         return itemDto;
     }
+
+    @Override
+    public Item fromDTO(ItemDto itemDto) {
+        return new Item(itemDto.getId(), itemDto.getName(), itemDto.getDescription(), itemDto.isAvailable(),
+                itemDto.getOwner(),itemDto.getRequest());
+    }
 }

@@ -2,6 +2,7 @@ package exceptions;
 
 import exceptions.userExceptions.EmailAlreadyExistException;
 import exceptions.userExceptions.InvalidEmailException;
+import exceptions.userExceptions.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -41,4 +42,10 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler({UserNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFoundException(final RuntimeException e) {
+        log.debug("Возникла ошибка {},", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 }

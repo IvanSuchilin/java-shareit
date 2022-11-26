@@ -34,7 +34,7 @@ public class UserController {
 
     @PostMapping("/users")
     public UserDto create(@RequestBody User user) {
-        log.info("Создание пользователя");
+        log.info("Создание пользователя {}", user.getName());
         UserDto userDto = userMapper.toDTO(userService.create(user));
         return userDto;
     }
