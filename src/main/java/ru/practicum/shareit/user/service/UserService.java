@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.storage.UserStorage;
 import ru.practicum.shareit.user.validator.UserDtoValidator;
 import ru.practicum.shareit.user.validator.UserValidator;
 
-
 import java.util.Collection;
 
 @Slf4j

@@ -9,6 +9,5 @@ import ru.practicum.shareit.user.model.User;
 
 @Mapper
 public interface UserMapper {
-    /*UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);*/
     UserDto toDTO(User user);
 }
