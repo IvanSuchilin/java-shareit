@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -58,5 +59,11 @@ public class ItemController {
         log.info("Получение всех вещей пользователя");
         userService.getUserById(userId);
         return itemService.getAllUsersItems(userId);
+    }
+
+    @GetMapping("/items/search")
+    public Collection<ItemDto> searchItem(@RequestParam String text) {
+        log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
+        return itemService.searchItem(text);
     }
 }

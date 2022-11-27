@@ -74,4 +74,8 @@ public class ItemService {
     public Collection<ItemDto> getAllUsersItems(Long userId) {
         return itemStorage.getAllOwnerItems(userId).stream().map(itemMapper::toDTO).collect(Collectors.toList());
     }
+
+    public Collection<ItemDto> searchItem(String text) {
+        return itemStorage.searchItem(text).stream().map(itemMapper::toDTO).collect(Collectors.toList());
+    }
 }

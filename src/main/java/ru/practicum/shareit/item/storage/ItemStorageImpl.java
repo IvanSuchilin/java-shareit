@@ -9,6 +9,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Repository
@@ -68,5 +70,14 @@ public class ItemStorageImpl implements ItemStorage {
     public Item getItemById(Long itemId) {
         List<Item> allItems = getAllItems();
        return allItems.stream().filter(i -> i.getId().equals(itemId)).findFirst().orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public List<Item> searchItem(String text) {
+        List<Item> allItems = getAllItems();
+        List<Item> saerchInName = allItems.stream().filter(i -> i.getName().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
+        List<Item> saerchInDescription = allItems.stream().filter(i -> i.getDescription().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
+        return Stream.of(saerchInName, saerchInDescription).distinct().flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 }
