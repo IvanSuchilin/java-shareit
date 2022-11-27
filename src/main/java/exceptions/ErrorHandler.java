@@ -1,5 +1,7 @@
 package exceptions;
 
+import exceptions.itemExceptions.InvalidItemDtoException;
+import exceptions.itemExceptions.ItemNotFoundException;
 import exceptions.userExceptions.EmailAlreadyExistException;
 import exceptions.userExceptions.InvalidEmailException;
 import exceptions.userExceptions.UserNotFoundException;
@@ -28,7 +30,7 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({InvalidEmailException.class})
+    @ExceptionHandler({InvalidEmailException.class, InvalidItemDtoException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateEmailException(final RuntimeException e) {
         log.debug("Возникла ошибка {},", e.getMessage());
@@ -42,7 +44,7 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({UserNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final RuntimeException e) {
         log.debug("Возникла ошибка {},", e.getMessage());

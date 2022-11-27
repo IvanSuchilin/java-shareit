@@ -37,4 +37,17 @@ public class ItemController {
         userService.getUserById(userId);
         return itemService.create(userId, itemDto);
     }
+
+    @PatchMapping("/items/{itemId}")
+    public ItemDto patch(@PathVariable("itemId") Long id,@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
+        log.info("Обновлеие данных вещи {}", itemDto.getName());
+        userService.getUserById(id);
+        return itemService.update(userId, itemDto);
+    }
+
+    @GetMapping("/items/{itemId}")
+    public ItemDto get(@PathVariable("itemId") Long id) {
+        log.info("Получение информации о вещи id {}", id);
+        return itemService.getItemById(id);
+    }
 }
