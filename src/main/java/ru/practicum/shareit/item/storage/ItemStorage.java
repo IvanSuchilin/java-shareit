@@ -11,7 +11,7 @@ public interface ItemStorage {
 
     Item create(Item item);
 
-    ItemDto update(Long id, ItemDto itemDto);
+    Item update(Long itemId, Long ownerId, Item item);
 
     Item getItemById(Long itemId);
 }

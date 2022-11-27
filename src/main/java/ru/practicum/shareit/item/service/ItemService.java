@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -38,14 +39,28 @@ public class ItemService {
         return itemMapper.toDTO(itemStorage.create(itemFromDto));
     }
 
-    public ItemDto update(Long userId, ItemDto itemDto) {
-        if (!itemDto.getOwner().getId().equals(userId)) {
+    public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
+        if (!itemStorage.getItemById(itemId).getOwner().getId().equals(userId)) {
             throw new UserNotFoundException("Нет такого владельца вещи");
         }
         Item itemFromDto = itemMapper.fromDTO(itemDto);
         User owner = userStorage.getUserById(userId);
-        itemFromDto.setOwner(owner);
-        return null;
+        //itemFromDto.setOwner(owner);
+        Item itemFromMemoryDto = itemMapper.fromDTO(getItemById(itemId));
+       /* if (itemFromDto.getRequest() != null || itemFromDto.getOwner() != null || itemFromDto.getId() != null)*/
+        if (itemFromDto.getRequest() != null || itemFromDto.getOwner() != null) {
+            throw new RuntimeException("Нельзя менять владельца и id");
+        }
+        if (itemFromDto.getAvailable() != null) {
+            itemFromMemoryDto.setAvailable(itemFromDto.getAvailable());
+        }
+        if (itemFromDto.getName() != null) {
+            itemFromMemoryDto.setName(itemFromDto.getName());
+        }
+        if (itemFromDto.getDescription() != null) {
+            itemFromMemoryDto.setDescription(itemFromDto.getDescription());
+        }
+        return itemMapper.toDTO(itemStorage.update(itemId, userId, itemFromMemoryDto));
     }
 
     public ItemDto getItemById(Long id) {
@@ -55,5 +70,8 @@ public class ItemService {
             throw new UserNotFoundException("Нет такого id");
         }
         return itemMapper.toDTO(itemStorage.getItemById(id));
+    }
+
+    public Collection<ItemDto> getAllUsersItems(Long userId) {
     }
 }

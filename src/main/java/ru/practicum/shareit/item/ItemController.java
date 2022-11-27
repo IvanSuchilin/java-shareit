@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mappers.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mappers.UserMapper;
@@ -42,12 +43,20 @@ public class ItemController {
     public ItemDto patch(@PathVariable("itemId") Long id,@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
         log.info("Обновлеие данных вещи {}", itemDto.getName());
         userService.getUserById(id);
-        return itemService.update(userId, itemDto);
+        itemService.getItemById(id);
+        return itemService.update(id, userId, itemDto);
     }
 
     @GetMapping("/items/{itemId}")
     public ItemDto get(@PathVariable("itemId") Long id) {
         log.info("Получение информации о вещи id {}", id);
         return itemService.getItemById(id);
+    }
+
+    @GetMapping("/items")
+    public Collection<ItemDto> findAllUsersItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("Получение всех вещей пользователя");
+        userService.getUserById(userId);
+        return itemService.getAllUsersItems(userId);
     }
 }

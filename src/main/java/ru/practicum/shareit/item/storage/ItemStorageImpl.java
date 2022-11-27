@@ -53,8 +53,15 @@ public class ItemStorageImpl implements ItemStorage {
         }
 
     @Override
-    public ItemDto update(Long id, ItemDto itemDto) {
-        return null;
+    public Item update(Long itemId,Long ownerId, Item item) {
+        List<Item> ownersItems = items.get(ownerId);
+        for (int i = 0; i < ownersItems.size(); i++){
+            if (ownersItems.get(i).getId() == itemId){
+                ownersItems.remove(i);
+            }
+        }
+        items.get(ownerId).add(item);
+        return getItemById(itemId);
     }
 
     @Override
