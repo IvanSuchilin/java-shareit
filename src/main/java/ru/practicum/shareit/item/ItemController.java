@@ -42,7 +42,7 @@ public class ItemController {
     @PatchMapping("/items/{itemId}")
     public ItemDto patch(@PathVariable("itemId") Long id,@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
         log.info("Обновлеие данных вещи {}", itemDto.getName());
-        userService.getUserById(id);
+        userService.getUserById(userId);
         itemService.getItemById(id);
         return itemService.update(id, userId, itemDto);
     }
