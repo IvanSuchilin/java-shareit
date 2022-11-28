@@ -1,14 +1,14 @@
 package ru.practicum.shareit.item.service;
 
-import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
-import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mappers.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.item.validator.ItemDtoValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
@@ -22,17 +22,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemService {
     //private final ItemValidator itemValidator;
-    //private final ItemDtoValidator itemDtoValidator;
+    private final ItemDtoValidator itemDtoValidator;
     private final ItemStorage itemStorage;
     private final ItemMapper itemMapper;
     private final UserStorage userStorage;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         log.debug("Получен запрос POST /items");
-        if (itemDto.getAvailable() == null || itemDto.getDescription() == null
-                || itemDto.getName().isEmpty()) {
-            throw new InvalidItemDtoException("Отсутствуют необходимые данные для создания item");
-        }
+        itemDtoValidator.validateItemDto(itemDto);
         Item itemFromDto = itemMapper.fromDTO(itemDto);
         User owner = userStorage.getUserById(userId);
         itemFromDto.setOwner(owner);
