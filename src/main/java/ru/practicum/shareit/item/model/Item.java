@@ -4,6 +4,8 @@ import lombok.*;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Objects;
+
 /**
  * TODO Sprint add-controllers.
  */
@@ -30,7 +32,7 @@ public class Item {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return id == item.id && name.equals(item.name) && description.equals(item.description)
+        return Objects.equals(id, item.id) && name.equals(item.name) && description.equals(item.description)
                 && available.equals(item.available) && owner.equals(item.owner) && request.equals(item.request);
     }
 }
