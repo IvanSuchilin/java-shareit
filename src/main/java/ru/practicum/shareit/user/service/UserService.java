@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.validator.UserDtoValidator;
 import ru.practicum.shareit.user.validator.UserValidator;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -24,7 +25,6 @@ public class UserService {
     public User create(User user) {
         log.debug("Получен запрос POST /users");
         userValidator.validateUser(user);
-        User newUser = null;
         if (userStorage.getAllUsers().stream().anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }
@@ -33,7 +33,7 @@ public class UserService {
 
     public User getUserById(Long id) {
         log.debug("Получен запрос GET /users/{userId}");
-        if (!userStorage.getAllUsers().stream().anyMatch(u -> u.getId() == id)) {
+        if (userStorage.getAllUsers().stream().noneMatch(u -> Objects.equals(u.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
         return userStorage.getUserById(id);

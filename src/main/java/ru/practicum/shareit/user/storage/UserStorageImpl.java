@@ -1,13 +1,15 @@
 package ru.practicum.shareit.user.storage;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
@@ -25,10 +27,9 @@ public class UserStorageImpl implements UserStorage {
     @Override
     public User createUser(User user) {
         idMemory++;
-        User newUser = user;
-        newUser.setId(idMemory);
-        users.put(idMemory, newUser);
-        return users.get(newUser.getId());
+        user.setId(idMemory);
+        users.put(idMemory, user);
+        return users.get(user.getId());
     }
 
     @Override
@@ -51,5 +52,4 @@ public class UserStorageImpl implements UserStorage {
     public void deleteUserById(Long userId) {
         users.remove(userId);
     }
-
 }

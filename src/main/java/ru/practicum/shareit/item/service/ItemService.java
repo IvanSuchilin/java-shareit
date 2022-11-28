@@ -44,9 +44,7 @@ public class ItemService {
             throw new UserNotFoundException("Нет такого владельца вещи");
         }
         Item itemFromDto = itemMapper.fromDTO(itemDto);
-        //itemFromDto.setOwner(owner);
         Item itemFromMemoryDto = itemMapper.fromDTO(getItemById(itemId));
-       /* if (itemFromDto.getRequest() != null || itemFromDto.getOwner() != null || itemFromDto.getId() != null)*/
         if (itemFromDto.getRequest() != null || itemFromDto.getOwner() != null) {
             throw new RuntimeException("Нельзя менять владельца и id");
         }
