@@ -1,4 +1,4 @@
-package exceptions.itemExceptions;
+package ru.practicum.shareit.exceptions.itemExceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

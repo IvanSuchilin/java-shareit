@@ -29,7 +29,7 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public UserDto get(@PathVariable("userId") Long id) {
         log.info("Получение пользователя id {}", id);
-        return userMapper.toDTO(userService.getUserById(id));
+        return userService.getUserById(id);
     }
 
     @PostMapping("/users")
@@ -42,7 +42,7 @@ public class UserController {
     public UserDto patch(@PathVariable("userId") Long id, @RequestBody UserDto userDto) {
         log.info("Обновлеие данных пользователя id {}", id);
         userService.getUserById(id);
-        return userMapper.toDTO(userService.update(id, userDto));
+        return userService.update(id, userDto);
     }
 
     @DeleteMapping("/users/{userId}")
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public Collection<User> findAll() {
+    public Collection<UserDto> findAll() {
         log.info("Получение всех пользователей");
         return userService.getAllUsers();
     }

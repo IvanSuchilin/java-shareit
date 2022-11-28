@@ -1,17 +1,16 @@
-package exceptions;
+package ru.practicum.shareit.exceptions;
 
-import exceptions.itemExceptions.InvalidItemDtoException;
-import exceptions.itemExceptions.ItemNotFoundException;
-import exceptions.userExceptions.EmailAlreadyExistException;
-import exceptions.userExceptions.InvalidEmailException;
-import exceptions.userExceptions.UserNotFoundException;
+import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
+import ru.practicum.shareit.exceptions.itemExceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.userExceptions.EmailAlreadyExistException;
+import ru.practicum.shareit.exceptions.userExceptions.InvalidEmailException;
+import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import response.ErrorResponse;
+import ru.practicum.shareit.response.ErrorResponse;
 
 @Slf4j
 @RestControllerAdvice

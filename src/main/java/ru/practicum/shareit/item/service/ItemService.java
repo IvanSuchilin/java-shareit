@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.service;
 
-import exceptions.itemExceptions.InvalidItemDtoException;
-import exceptions.userExceptions.UserNotFoundException;
+import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
+import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -70,6 +70,7 @@ public class ItemService {
     }
 
     public Collection<ItemDto> getAllUsersItems(Long userId) {
+        log.debug("Получен запрос GET /items");
         return itemStorage.getAllOwnerItems(userId).stream().map(itemMapper::toDTO).collect(Collectors.toList());
     }
 

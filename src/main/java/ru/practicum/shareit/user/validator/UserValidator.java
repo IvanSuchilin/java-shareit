@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user.validator;
 
-import exceptions.userExceptions.InvalidEmailException;
-import exceptions.userExceptions.UserEmptyNameException;
+import ru.practicum.shareit.exceptions.userExceptions.InvalidEmailException;
+import ru.practicum.shareit.exceptions.userExceptions.UserEmptyNameException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.model.User;
