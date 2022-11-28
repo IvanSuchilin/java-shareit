@@ -11,9 +11,8 @@ public class ItemMapperImpl implements ItemMapper {
         if (item == null) {
             return null;
         }
-        ItemDto itemDto = new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(),
+        return new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(),
                 item.getOwner(), item.getRequest());
-        return itemDto;
     }
 
     @Override
