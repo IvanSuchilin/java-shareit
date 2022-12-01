@@ -9,6 +9,8 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
 
+import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
+
 /**
  * TODO Sprint add-controllers.
  */
@@ -16,7 +18,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping
 public class ItemController {
-    private final String REQUEST_HEADER_SHARER = "X-Sharer-User-Id";
     private final ItemService itemService;
     private final UserService userService;
 
