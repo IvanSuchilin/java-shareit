@@ -21,15 +21,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-    //private final ItemValidator itemValidator;
     private final ItemDtoValidator itemDtoValidator;
     private final ItemStorage itemStorage;
     private final ItemMapper itemMapper;
     private final UserStorage userStorage;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
-        log.debug("Получен запрос POST /items");
         itemDtoValidator.validateItemDto(itemDto);
+        log.debug("Получен на создание вещи {}", itemDto.getName());
         Item itemFromDto = itemMapper.fromDTO(itemDto);
         User owner = userStorage.getUserById(userId);
         itemFromDto.setOwner(owner);
@@ -68,10 +67,16 @@ public class ItemService {
 
     public Collection<ItemDto> getAllUsersItems(Long userId) {
         log.debug("Получен запрос GET /items");
-        return itemStorage.getAllOwnerItems(userId).stream().map(itemMapper::toDTO).collect(Collectors.toList());
+        return itemStorage.getAllOwnerItems(userId)
+                .stream()
+                .map(itemMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Collection<ItemDto> searchItem(String text) {
-        return itemStorage.searchItem(text).stream().map(itemMapper::toDTO).collect(Collectors.toList());
+        return itemStorage.searchItem(text)
+                .stream()
+                .map(itemMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

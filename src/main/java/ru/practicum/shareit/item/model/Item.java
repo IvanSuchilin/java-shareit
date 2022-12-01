@@ -4,8 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Objects;
-
 /**
  * TODO Sprint add-controllers.
  */
@@ -14,6 +12,7 @@ import java.util.Objects;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Item {
     private Long id;
     private String name;
@@ -25,14 +24,5 @@ public class Item {
     @Override
     public int hashCode() {
         return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return Objects.equals(id, item.id) && name.equals(item.name) && description.equals(item.description)
-                && available.equals(item.available) && owner.equals(item.owner) && request.equals(item.request);
     }
 }

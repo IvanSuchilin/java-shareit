@@ -27,9 +27,10 @@ public class ItemStorageImpl implements ItemStorage {
 
     public List<Item> getAllItems() {
         List<Item> allItems = new ArrayList<>();
-        for (Long k : items.keySet()) {
-            allItems.addAll(items.get(k));
-        }
+        items.values()
+                .stream()
+                .map(allItems::addAll)
+                .collect(Collectors.toList());
         return allItems;
     }
 
@@ -62,7 +63,10 @@ public class ItemStorageImpl implements ItemStorage {
     @Override
     public Item getItemById(Long itemId) {
         List<Item> allItems = getAllItems();
-        return allItems.stream().filter(i -> i.getId().equals(itemId)).findFirst().orElseThrow(IllegalArgumentException::new);
+        return allItems
+                .stream().filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -71,10 +75,17 @@ public class ItemStorageImpl implements ItemStorage {
             return new ArrayList<>();
         }
         List<Item> allItems = getAllItems();
-        List<Item> searchInName = allItems.stream().filter(i -> i.getName().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
-        List<Item> searchInDescription = allItems.stream().filter(i -> i.getDescription().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
-        List<Item> searching = Stream.of(searchInName, searchInDescription).distinct().flatMap(List::stream)
+        List<Item> searchInName = allItems
+                .stream()
+                .filter(i -> i.getName().toLowerCase().contains(text.toLowerCase()))
                 .collect(Collectors.toList());
-        return searching.stream().distinct().filter(item -> item.getAvailable().equals(true)).collect(Collectors.toList());
+        List<Item> searchInDescription = allItems
+                .stream().filter(i -> i.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .collect(Collectors.toList());
+        return Stream.of(searchInName, searchInDescription)
+                .flatMap(List::stream)
+                .filter(item -> item.getAvailable().equals(true))
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

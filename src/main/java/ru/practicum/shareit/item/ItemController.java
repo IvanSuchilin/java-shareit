@@ -16,6 +16,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping
 public class ItemController {
+    private final String REQUEST_HEADER_SHARER = "X-Sharer-User-Id";
     private final ItemService itemService;
     private final UserService userService;
 
@@ -26,15 +27,16 @@ public class ItemController {
     }
 
     @PostMapping("/items")
-    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
+    public ItemDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody ItemDto itemDto) {
         log.info("Создание вещи {}", itemDto.getName());
         userService.getUserById(userId);
         return itemService.create(userId, itemDto);
     }
 
     @PatchMapping("/items/{itemId}")
-    public ItemDto patch(@PathVariable("itemId") Long id, @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
-        log.info("Обновлеие данных вещи {}", itemDto.getName());
+    public ItemDto patch(@PathVariable("itemId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                         @RequestBody ItemDto itemDto) {
+        log.info("Обновление данных вещи {}", itemDto.getName());
         userService.getUserById(userId);
         itemService.getItemById(id);
         return itemService.update(id, userId, itemDto);
@@ -47,7 +49,7 @@ public class ItemController {
     }
 
     @GetMapping("/items")
-    public Collection<ItemDto> findAllUsersItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Collection<ItemDto> findAllUsersItems(@RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
         log.info("Получение всех вещей пользователя");
         userService.getUserById(userId);
         return itemService.getAllUsersItems(userId);

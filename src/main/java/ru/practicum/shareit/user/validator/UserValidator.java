@@ -11,11 +11,11 @@ import ru.practicum.shareit.user.model.User;
 public class UserValidator {
     public void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.error("Адрес электронной почты не может быть пустым и должен содержать символ @");
+            log.warn("Адрес электронной почты не может быть пустым и должен содержать символ @");
             throw new InvalidEmailException("Адрес электронной почты не может быть пустым и должен содержать символ @");
         }
         if (user.getName() == null || user.getName().isEmpty()) {
-            log.error("Имя пользователя не может быть пустым");
+            log.warn("Имя пользователя не может быть пустым");
             throw new UserEmptyNameException("Имя не может быть пустым");
         }
     }

@@ -26,9 +26,11 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User create(User user) {
-        log.debug("Получен запрос POST /users");
         userValidator.validateUser(user);
-        if (userStorage.getAllUsers().stream().anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
+        log.debug("Получен запрос на создание пользователя {}", user.getName());
+        if (userStorage.getAllUsers()
+                .stream()
+                .anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }
         return userStorage.createUser(user);
@@ -36,7 +38,9 @@ public class UserService {
 
     public UserDto getUserById(Long id) {
         log.debug("Получен запрос GET /users/{userId}");
-        if (userStorage.getAllUsers().stream().noneMatch(u -> Objects.equals(u.getId(), id))) {
+        if (userStorage.getAllUsers()
+                .stream()
+                .noneMatch(u -> Objects.equals(u.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
         return userMapper.toDTO(userStorage.getUserById(id));
@@ -46,7 +50,9 @@ public class UserService {
         log.debug("Получен запрос PATCH /users/{userId}");
         if (userDto.getEmail() != null) {
             userDtoValidator.validateUserDto(userDto);
-            if (userStorage.getAllUsers().stream().anyMatch(u -> u.getEmail().equals(userDto.getEmail()))) {
+            if (userStorage.getAllUsers()
+                    .stream()
+                    .anyMatch(u -> u.getEmail().equals(userDto.getEmail()))) {
                 throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
             }
         }
@@ -60,6 +66,9 @@ public class UserService {
 
     public Collection<UserDto> getAllUsers() {
         log.debug("Получен запрос GET /users");
-        return userStorage.getAllUsers().stream().map(userMapper::toDTO).collect(Collectors.toList());
+        return userStorage.getAllUsers()
+                .stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

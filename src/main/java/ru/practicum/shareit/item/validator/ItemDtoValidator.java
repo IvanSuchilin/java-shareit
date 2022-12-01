@@ -11,6 +11,7 @@ public class ItemDtoValidator {
     public void validateItemDto(ItemDto itemDto) {
         if (itemDto.getAvailable() == null || itemDto.getDescription() == null
                 || itemDto.getName().isEmpty()) {
+            log.warn("Отсутствуют необходимые данные для создания item");
             throw new InvalidItemDtoException("Отсутствуют необходимые данные для создания item");
         }
     }
