@@ -13,4 +13,4 @@ public class UserMapperImpl implements UserMapper {
         }
         return new UserDto(user.getId(), user.getName(), user.getEmail());
     }
-}
+} 
