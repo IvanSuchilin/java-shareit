@@ -2,11 +2,13 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.userExceptions.EmailAlreadyExistException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mappers.UserMapper;
+import ru.practicum.shareit.user.mappers.UserRepositoryMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.storage.UserStorage;
@@ -24,7 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserValidator userValidator;
-    private final UserMapper userMapper;
+    //private final UserMapper userMapper;
     private final UserDtoValidator userDtoValidator;
     private final UserStorage userStorage;
 
@@ -36,8 +38,13 @@ public class UserService {
                 .anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }*/
-       // return userStorage.createUser(user);
-        User saveUser = userRepository.save(user);
+        // return userStorage.createUser(user);
+        User saveUser;
+        try {
+            saveUser = userRepository.save(user);
+        } catch (Throwable e) {
+            throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
+        }
         return saveUser;
     }
 
@@ -48,7 +55,7 @@ public class UserService {
                 .noneMatch(u -> Objects.equals(u.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        return userMapper.toDTO(userRepository.getReferenceById(id));
+        return UserMapper.INSTANCE.toDTO(userRepository.getReferenceById(id));
     }
 
     public UserDto update(Long id, UserDto userDto) {
@@ -61,7 +68,14 @@ public class UserService {
                 throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
             }
         }
-        return userMapper.toDTO(userStorage.update(id, userDto));
+try {
+    User stored = userRepository.findById(id)
+            .orElseThrow(ChangeSetPersister.NotFoundException::new);
+    UserRepositoryMapper.INSTANCE.updateUser(userDto, stored);
+    return UserRepositoryMapper.INSTANCE.toUserDto(userRepository.save(stored));
+} catch (ChangeSetPersister.NotFoundException e){
+    throw new UserNotFoundException("Нет такого пользователя");
+}
     }
 
     public void delete(Long id) {
@@ -73,7 +87,7 @@ public class UserService {
         log.debug("Получен запрос GET /users");
         return userRepository.findAll()
                 .stream()
-                .map(userMapper::toDTO)
+                .map(UserMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
     }
 }

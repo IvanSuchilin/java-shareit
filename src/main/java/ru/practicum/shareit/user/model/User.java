@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "users")
+@Table(schema = "public", name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
