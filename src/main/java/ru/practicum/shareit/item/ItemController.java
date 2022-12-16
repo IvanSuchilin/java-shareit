@@ -7,8 +7,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.Collection;
-
 import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
 
 /**
@@ -34,6 +32,11 @@ public class ItemController {
         return itemService.create(userId, itemDto);
     }
 
+    @GetMapping("/items/{itemId}")
+    public ItemDto get(@PathVariable("itemId") Long id) {
+        log.info("Получение информации о вещи id {}", id);
+        return itemService.getItemById(id);
+    }
     @PatchMapping("/items/{itemId}")
     public ItemDto patch(@PathVariable("itemId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                          @RequestBody ItemDto itemDto) {
@@ -43,11 +46,8 @@ public class ItemController {
         return itemService.update(id, userId, itemDto);
     }
 
-    @GetMapping("/items/{itemId}")
-    public ItemDto get(@PathVariable("itemId") Long id) {
-        log.info("Получение информации о вещи id {}", id);
-        return itemService.getItemById(id);
-    }
+  /*
+
 
     @GetMapping("/items")
     public Collection<ItemDto> findAllUsersItems(@RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
@@ -60,5 +60,5 @@ public class ItemController {
     public Collection<ItemDto> searchItem(@RequestParam String text) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
         return itemService.searchItem(text);
-    }
+    }*/
 }

@@ -36,7 +36,7 @@ public class UserController {
     @PostMapping("/users")
     public UserDto create(@RequestBody User user) {
         log.info("Создание пользователя {}", user.getName());
-        return UserMapper.INSTANCE.toDTO(userService.create(user));
+        return UserMapper.INSTANCE.toDto(userService.create(user));
     }
 
     @PatchMapping("/users/{userId}")

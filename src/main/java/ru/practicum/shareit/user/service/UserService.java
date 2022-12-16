@@ -8,7 +8,6 @@ import ru.practicum.shareit.exceptions.userExceptions.EmailAlreadyExistException
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mappers.UserMapper;
-import ru.practicum.shareit.user.mappers.UserRepositoryMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.storage.UserStorage;
@@ -55,7 +54,7 @@ public class UserService {
                 .noneMatch(u -> Objects.equals(u.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        return UserMapper.INSTANCE.toDTO(userRepository.getReferenceById(id));
+        return UserMapper.INSTANCE.toDto(userRepository.getReferenceById(id));
     }
 
     public UserDto update(Long id, UserDto userDto) {
@@ -68,14 +67,14 @@ public class UserService {
                 throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
             }
         }
-try {
-    User stored = userRepository.findById(id)
-            .orElseThrow(ChangeSetPersister.NotFoundException::new);
-    UserRepositoryMapper.INSTANCE.updateUser(userDto, stored);
-    return UserRepositoryMapper.INSTANCE.toUserDto(userRepository.save(stored));
-} catch (ChangeSetPersister.NotFoundException e){
-    throw new UserNotFoundException("Нет такого пользователя");
-}
+        try {
+            User stored = userRepository.findById(id)
+                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
+            UserMapper.INSTANCE.updateUser(userDto, stored);
+            return UserMapper.INSTANCE.toDto(userRepository.save(stored));
+        } catch (ChangeSetPersister.NotFoundException e) {
+            throw new UserNotFoundException("Нет такого пользователя");
+        }
     }
 
     public void delete(Long id) {
@@ -87,7 +86,7 @@ try {
         log.debug("Получен запрос GET /users");
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper.INSTANCE::toDTO)
+                .map(UserMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
     }
 }

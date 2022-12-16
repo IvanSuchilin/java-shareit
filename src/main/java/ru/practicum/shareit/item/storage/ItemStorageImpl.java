@@ -3,19 +3,11 @@ package ru.practicum.shareit.item.storage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.model.Item;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Repository
 @Getter
 @RequiredArgsConstructor
-public class ItemStorageImpl implements ItemStorage {
+public class ItemStorageImpl  {/*
     private Long idMemory = 0L;
 
     private Map<Long, List<Item>> items = new HashMap<>();
@@ -33,7 +25,7 @@ public class ItemStorageImpl implements ItemStorage {
                 .collect(Collectors.toList());
         return allItems;
     }
-
+*//*
     @Override
     public Item create(Item item) {
         idMemory++;
@@ -46,7 +38,7 @@ public class ItemStorageImpl implements ItemStorage {
             return userItems;
         });
         return item;
-    }
+    }*//*
 
     @Override
     public Item update(Long itemId, Long ownerId, Item item) {
@@ -87,5 +79,5 @@ public class ItemStorageImpl implements ItemStorage {
                 .filter(item -> item.getAvailable().equals(true))
                 .distinct()
                 .collect(Collectors.toList());
-    }
+    }*/
 }
