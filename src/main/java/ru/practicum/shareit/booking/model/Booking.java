@@ -4,6 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(schema = "puclic")
 public class Booking {
+
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;

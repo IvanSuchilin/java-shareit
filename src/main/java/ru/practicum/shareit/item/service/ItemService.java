@@ -13,8 +13,11 @@ import ru.practicum.shareit.item.validator.ItemDtoValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,22 +83,22 @@ public class ItemService {
         }
     }
 
-   /*
-
-
 
     public Collection<ItemDto> getAllUsersItems(Long userId) {
         log.debug("Получен запрос GET /items");
-        return itemStorage.getAllOwnerItems(userId)
+        return itemRepository.findItemByOwnerId(userId)
                 .stream()
-                .map(itemMapper::toDTO)
+                .map(ItemMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
     }
-
     public Collection<ItemDto> searchItem(String text) {
-        return itemStorage.searchItem(text)
+        if(text.isEmpty()){
+            return new ArrayList<>();
+        }
+        String lowText = text.toLowerCase();
+        return itemRepository.findByText(lowText)
                 .stream()
-                .map(itemMapper::toDTO)
+                .map(ItemMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
-    }*/
+    }
 }
