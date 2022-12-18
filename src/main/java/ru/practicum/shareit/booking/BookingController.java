@@ -35,4 +35,19 @@ public class BookingController {
         userService.getUserById(userId);
         return bookingService.create(userId, bookingCreateDto);
     }
+
+    @GetMapping("/bookings/{bookingId}")
+    public BookingDto get(@PathVariable("bookingId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
+        log.info("Получение информации о бронировании id {}", id);
+        return bookingService.getBookingById(id, userId);
+    }
+
+    @PatchMapping("/bookings/{bookingId}")
+    public BookingDto patch(@PathVariable("bookingId") Long itemId,
+            @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                         @RequestParam(name = "approved", required = true) Boolean approved) {
+        log.info("Подтверждение/отклонение бронирования вещи {}", itemId);
+        bookingService.getBookingById(itemId, userId);
+        return bookingService.updateApproving(itemId, userId, approved);
+    }
 }
