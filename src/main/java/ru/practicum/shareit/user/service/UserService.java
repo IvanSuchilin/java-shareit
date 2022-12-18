@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mappers.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.storage.UserStorage;
 import ru.practicum.shareit.user.validator.UserDtoValidator;
 import ru.practicum.shareit.user.validator.UserValidator;
 
@@ -27,7 +26,7 @@ public class UserService {
     private final UserValidator userValidator;
     //private final UserMapper userMapper;
     private final UserDtoValidator userDtoValidator;
-    private final UserStorage userStorage;
+    //private final UserStorage userStorage;
 
     public User create(User user) {
         userValidator.validateUser(user);
@@ -45,6 +44,7 @@ public class UserService {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }
         return saveUser;
+
     }
 
     public UserDto getUserById(Long id) {

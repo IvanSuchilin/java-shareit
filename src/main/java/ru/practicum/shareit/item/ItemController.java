@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
@@ -31,9 +30,6 @@ public class ItemController {
     @PostMapping("/items")
     public ItemDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody ItemDto itemDto) {
         log.info("Создание вещи {}", itemDto.getName());
-        if (userId == null) {
-            throw new UserNotFoundException("Владелец вещи отсутствует");
-        }
         userService.getUserById(userId);
         return itemService.create(userId, itemDto);
     }

@@ -21,7 +21,8 @@ import java.io.Serializable;
 public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id", nullable = false)
+
+    @Column(name = "item_id", updatable = false, nullable = false)
     private Long id;
     @Column(name = "name", nullable = false)
     private String name;

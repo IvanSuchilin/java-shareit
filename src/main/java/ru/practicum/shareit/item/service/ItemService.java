@@ -27,13 +27,14 @@ public class ItemService {
 
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    //private final ItemStorage itemStorage;
-    //private final ItemMapper itemMapper;
-    //private final UserStorage userStorage;
-
     public ItemDto create(Long userId, ItemDto itemDto) {
         itemDtoValidator.validateItemDto(itemDto);
         log.debug("Получен на создание вещи {}", itemDto.getName());
+        if (userRepository.findAll()
+                .stream()
+                .noneMatch(u -> Objects.equals(u.getId(), userId))) {
+            throw new UserNotFoundException("Нет такого id");
+        }
         User owner = userRepository.getReferenceById(userId);
         //Item itemFromDto = ItemMapper.INSTANCE.toItem(itemDto, owner.getId(),owner.getName(), owner.getEmail());
         Item itemFromDto = ItemMapper.INSTANCE.toItem(itemDto);

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS COMMENTS
     TEXT       CHARACTER VARYING,
     ITEM_ID    BIGINT,
     AUTHOR_ID  BIGINT,
+    CREATED TIMESTAMP WITHOUT TIME ZONE not null ,
     constraint COMMENTS_ITEMS_ITEM_ID_FK
         foreign key (ITEM_ID) references ITEMS
             on update cascade on delete cascade,
@@ -50,11 +51,11 @@ CREATE TABLE IF NOT EXISTS BOOKINGS
     BOOKING_ID BIGINT auto_increment
         primary key
         unique,
-    START_DATE TIMESTAMP,
-    END_DATE   TIMESTAMP,
+    START_DATE TIMESTAMP WITHOUT TIME ZONE,
+    END_DATE   TIMESTAMP WITHOUT TIME ZONE,
     ITEM_ID    BIGINT,
     BOOKER_ID  BIGINT,
-    STATUS     BOOLEAN,
+    STATUS     VARCHAR,
     constraint BOOKINGS_ITEMS_ITEM_ID_FK
         foreign key (ITEM_ID) references ITEMS
             on update cascade on delete cascade,

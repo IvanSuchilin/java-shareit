@@ -4,7 +4,8 @@ import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -15,17 +16,29 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(schema = "puclic")
-public class Booking {
 
+@Entity
+@Table(schema = "public", name = "bookings")
+public class Booking implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "booking_id", updatable = false, nullable = false, unique = true)
     private Long id;
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime start;
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booker_id", nullable = false)
     private User booker;
-    private Status status;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "status", nullable = false)
+    private BookingStatus status;
 
-    public enum Status {
+    public enum BookingStatus {
         WAITING,
         APPROVED,
         REJECTED,
