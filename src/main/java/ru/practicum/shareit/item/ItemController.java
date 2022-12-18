@@ -39,19 +39,23 @@ public class ItemController {
         log.info("Получение информации о вещи id {}", id);
         return itemService.getItemById(id);
     }
+
     @PatchMapping("/items/{itemId}")
     public ItemDto patch(@PathVariable("itemId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                          @RequestBody ItemDto itemDto) {
-            log.info("Обновление данных вещи {}", itemDto.getName());
+        log.info("Обновление данных вещи {}", id);
         userService.getUserById(userId);
         itemService.getItemById(id);
-        return itemService.update(id, userId, itemDto);}
+        return itemService.update(id, userId, itemDto);
+    }
+
     @GetMapping("/items")
     public Collection<ItemDto> findAllUsersItems(@RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
         log.info("Получение всех вещей пользователя");
         userService.getUserById(userId);
         return itemService.getAllUsersItems(userId);
     }
+
     @GetMapping("/items/search")
     public Collection<ItemDto> searchItem(@RequestParam String text) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);

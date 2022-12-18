@@ -12,14 +12,11 @@ import java.time.LocalDateTime;
 public class BookingValidator {
     public void validateBookingCreateDto(BookingCreateDto bookingCreateDto) {
         if (bookingCreateDto.getItemId() == null ||
-                /*bookingCreateDto.getStart().before(Timestamp.valueOf(LocalDateTime.now())) ||
-                bookingCreateDto.getEnd().before(bookingCreateDto.getStart()) ||
-                bookingCreateDto.getEnd().before(Timestamp.valueOf(LocalDateTime.now()))) {*/
                 bookingCreateDto.getStart().isBefore(LocalDateTime.now()) ||
                 bookingCreateDto.getEnd().isBefore(bookingCreateDto.getStart()) ||
                 bookingCreateDto.getEnd().isBefore(LocalDateTime.now())) {
             log.warn("Отсутствуют корректные данные для создания Booking");
-            throw new InvalidBookingDtoException("Отсутствуют необходимые данные для создания item");
+            throw new InvalidBookingDtoException("Отсутствуют необходимые данные для создания Booking");
         }
 }
 }

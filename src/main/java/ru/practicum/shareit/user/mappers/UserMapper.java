@@ -5,6 +5,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.user.dto.UserBookingDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 @Mapper(componentModel = "spring",
@@ -15,6 +17,9 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     User toUser(UserDto userDto);
 
+    UserBookingDto toUserBookingDto(Booking booking);
     @Mapping(target = "id", ignore = true)
     void updateUser (UserDto userDto, @MappingTarget User user);
+
+
 }

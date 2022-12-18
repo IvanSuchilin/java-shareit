@@ -21,12 +21,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
     private final UserValidator userValidator;
-    //private final UserMapper userMapper;
     private final UserDtoValidator userDtoValidator;
-    //private final UserStorage userStorage;
 
     public User create(User user) {
         userValidator.validateUser(user);
@@ -44,7 +41,6 @@ public class UserService {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }
         return saveUser;
-
     }
 
     public UserDto getUserById(Long id) {
