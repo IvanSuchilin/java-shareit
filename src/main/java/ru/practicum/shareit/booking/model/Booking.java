@@ -54,13 +54,13 @@ public class Booking implements Serializable {
         FUTURE,
         WAITING,
         REJECTED,
-        UNKNOWN;
+        UNSUPPORTED;
 
         public static BookingState getBookingStateFromQuery(String value) {
             return Arrays.stream(values())
                     .filter(item -> Objects.equals(value, item.name()))
                     .findFirst()
-                    .orElse(BookingState.UNKNOWN);
+                    .orElse(BookingState.UNSUPPORTED);
         }
     }
 }

@@ -90,15 +90,65 @@ public class BookingService {
         List<Booking> bookings;
         User userStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
-        Booking.BookingState bookingState = Objects.isNull(state) ? Booking.BookingState.ALL : Booking.BookingState.getBookingStateFromQuery(state);
+        Booking.BookingState bookingState = Objects.isNull(state) ?
+                Booking.BookingState.ALL : Booking.BookingState.getBookingStateFromQuery(state);
         switch (bookingState) {
             case ALL:
                 bookings = bookingRepository.findAllByBookerOrderByStartDesc(userStored);
                 break;
             case CURRENT:
                 bookings = bookingRepository.findCurrentByBooker(userStored, LocalDateTime.now());
+                break;
+            case PAST:
+                bookings = bookingRepository.findPastByBooker(userStored,LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookings = bookingRepository.findFutureByBooker(userStored, LocalDateTime.now());
+                break;
+            case WAITING:
+                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored,Booking.BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored,Booking.BookingStatus.REJECTED);
+                break;
             default:
-                throw new UserNotFoundException("нет такого");
+                throw new  ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
+        }
+        return bookings.stream()
+                .map(BookingMapper.INSTANCE::toBookingDto).
+                collect(Collectors.toList());
+    }
+
+    public List<BookingDto> getAllOwnersBooking(Long userId, String state) {
+        List<Booking> bookings;
+        User ownerStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Пользователя c id" + userId + " нет"));
+        if (itemRepository.findItemByOwnerId(userId).size() == 0){
+            throw new UserNotFoundException("У пользователя нет вещей для аренды");
+        }
+        Booking.BookingState bookingState = Objects.isNull(state) ?
+                Booking.BookingState.ALL : Booking.BookingState.getBookingStateFromQuery(state);
+        switch (bookingState) {
+            case ALL:
+                bookings = bookingRepository.findAllByOwnerItems(ownerStored);
+                break;
+            case CURRENT:
+                bookings = bookingRepository.findCurrentByOwnerItems(ownerStored, LocalDateTime.now());
+                break;
+            case PAST:
+                bookings = bookingRepository.findPastByOwnerItems(ownerStored,LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookings = bookingRepository.findFutureByOwnerItems(ownerStored, LocalDateTime.now());
+                break;
+            case WAITING:
+                bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored,Booking.BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored,Booking.BookingStatus.REJECTED);
+                break;
+            default:
+                throw new  ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
                 .map(BookingMapper.INSTANCE::toBookingDto).

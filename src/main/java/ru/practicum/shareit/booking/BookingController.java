@@ -60,4 +60,11 @@ public class BookingController {
         return bookingService.getAll(userId, state);
     }
 
+    @GetMapping("/bookings/owner")
+    public List<BookingDto> getAllToOwner(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                                   @RequestParam(name = "state", required = false) String state) {
+        userService.getUserById(userId);
+        return bookingService.getAllOwnersBooking(userId, state);
+    }
+
 }
