@@ -7,6 +7,8 @@ import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * TODO Sprint add-bookings.
@@ -43,5 +45,22 @@ public class Booking implements Serializable {
         APPROVED,
         REJECTED,
         CANCELED
+    }
+
+    public enum BookingState {
+        ALL,
+        CURRENT,
+        PAST,
+        FUTURE,
+        WAITING,
+        REJECTED,
+        UNKNOWN;
+
+        public static BookingState getBookingStateFromQuery(String value) {
+            return Arrays.stream(values())
+                    .filter(item -> Objects.equals(value, item.name()))
+                    .findFirst()
+                    .orElse(BookingState.UNKNOWN);
+        }
     }
 }

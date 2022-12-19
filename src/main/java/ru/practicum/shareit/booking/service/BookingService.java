@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.mappers.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.validator.BookingValidator;
+import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -18,7 +19,10 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,12 +41,12 @@ public class BookingService {
                 .noneMatch(u -> Objects.equals(u.getId(), userId))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        User booker = userRepository.findById(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Предмета c id" + userId + " нет"));
+        User booker = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Пользователя c id" + userId + " нет"));
         Long id = bookingCreateDto.getItemId();
-        Item item = itemRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        Item item = itemRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Предмета c id" + id + " нет"));
-        if (!item.getAvailable()){
+        if (!item.getAvailable()) {
             throw new InvalidItemDtoException("Вещь нельзя забронировать");
         }
         Booking newBooking = new Booking();
@@ -52,30 +56,52 @@ public class BookingService {
         newBooking.setItem(item);
         newBooking.setStatus(Booking.BookingStatus.WAITING);
         return BookingMapper.INSTANCE.toBookingDto(bookingRepository.save(newBooking));
-        }
+    }
 
     public BookingDto getBookingById(Long id, Long userId) {
-        bookingRepository.findById(id).orElseThrow(()->
+        bookingRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Бронирования c id" + id + " нет"));
+                        "Бронирования c id" + id + " нет"));
         Booking storedBooking = bookingRepository.findById(id).get();
         if (!Objects.equals(userId, storedBooking.getBooker().getId()) &&
-                !Objects.equals(userId, storedBooking.getItem().getOwner().getId())){
+                !Objects.equals(userId, storedBooking.getItem().getOwner().getId())) {
             throw new UserNotFoundException("Нет пользователя с доступом к информации");
         }
         return BookingMapper.INSTANCE.toBookingDto(storedBooking);
     }
 
-    public BookingDto updateApproving(Long itemId, Long userId, Boolean approved) {
-        Booking storedBooking = bookingRepository.findById(itemId).get();
-        if (!Objects.equals(storedBooking.getItem().getOwner().getId(), userId)){
+    public BookingDto updateApproving(Long bookingId, Long userId, Boolean approved) {
+        Booking storedBooking = bookingRepository.findById(bookingId).get();
+        if (!Objects.equals(storedBooking.getItem().getOwner().getId(), userId)) {
             throw new UserNotFoundException("Нет пользователя с доступом к изменению информации статуса бронирования");
         }
-        if(approved){
+        if (!Objects.equals(Booking.BookingStatus.WAITING, storedBooking.getStatus())) {
+            throw new ValidationFailedException("Статус бронирования не WAITING - обновление невозможно ");
+        }
+        if (approved) {
             storedBooking.setStatus(Booking.BookingStatus.APPROVED);
         } else {
             storedBooking.setStatus(Booking.BookingStatus.REJECTED);
         }
         return BookingMapper.INSTANCE.toBookingDto(bookingRepository.save(storedBooking));
+    }
+
+    public List<BookingDto> getAll(Long userId, String state) {
+        List<Booking> bookings;
+        User userStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Пользователя c id" + userId + " нет"));
+        Booking.BookingState bookingState = Objects.isNull(state) ? Booking.BookingState.ALL : Booking.BookingState.getBookingStateFromQuery(state);
+        switch (bookingState) {
+            case ALL:
+                bookings = bookingRepository.findAllByBookerOrderByStartDesc(userStored);
+                break;
+            case CURRENT:
+                bookings = bookingRepository.findCurrentByBooker(userStored, LocalDateTime.now());
+            default:
+                throw new UserNotFoundException("нет такого");
+        }
+        return bookings.stream()
+                .map(BookingMapper.INSTANCE::toBookingDto).
+                collect(Collectors.toList());
     }
 }

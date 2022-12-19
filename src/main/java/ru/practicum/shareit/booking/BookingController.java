@@ -9,6 +9,8 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.List;
+
 import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
 
 /**
@@ -43,11 +45,19 @@ public class BookingController {
     }
 
     @PatchMapping("/bookings/{bookingId}")
-    public BookingDto patch(@PathVariable("bookingId") Long itemId,
-            @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                         @RequestParam(name = "approved", required = true) Boolean approved) {
-        log.info("Подтверждение/отклонение бронирования вещи {}", itemId);
-        bookingService.getBookingById(itemId, userId);
-        return bookingService.updateApproving(itemId, userId, approved);
+    public BookingDto update(@PathVariable("bookingId") Long bookingId,
+                             @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                             @RequestParam(name = "approved") Boolean approved) {
+        log.info("Подтверждение/отклонение бронирования вещи {}", bookingId);
+        bookingService.getBookingById(bookingId, userId);
+        return bookingService.updateApproving(bookingId, userId, approved);
     }
+
+    @GetMapping("/bookings")
+    public List<BookingDto> getAll(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                                   @RequestParam(name = "state", required = false) String state) {
+        userService.getUserById(userId);
+        return bookingService.getAll(userId, state);
+    }
+
 }
