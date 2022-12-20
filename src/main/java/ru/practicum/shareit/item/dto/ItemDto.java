@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -22,6 +22,6 @@ public class ItemDto {
     private Boolean available;
     private User owner;
     private ItemRequest request;
-    private BookingDto nextBooking;
-    private BookingDto lastBooking;
+    private BookingItemDto nextBooking;
+    private BookingItemDto lastBooking;
 }

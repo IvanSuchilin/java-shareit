@@ -35,9 +35,10 @@ public class ItemController {
     }
 
     @GetMapping("/items/{itemId}")
-    public ItemDto get(@PathVariable("itemId") Long id) {
-        log.info("Получение информации о вещи id {}", id);
-        return itemService.getItemById(id);
+    public ItemDto get(@PathVariable("itemId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
+        log.info("Получение информации о вещи id {} пользователем {}", id, userId);
+        userService.getUserById(userId);
+        return itemService.getItemById(id , userId);
     }
 
     @PatchMapping("/items/{itemId}")
@@ -45,7 +46,7 @@ public class ItemController {
                          @RequestBody ItemDto itemDto) {
         log.info("Обновление данных вещи {}", id);
         userService.getUserById(userId);
-        itemService.getItemById(id);
+        itemService.getItemById(id, userId);
         return itemService.update(id, userId, itemDto);
     }
 

@@ -37,11 +37,6 @@ public class BookingService {
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
         bookingValidator.validateBookingCreateDto(bookingCreateDto);
         log.info("Создание бронирования вещи {}", bookingCreateDto.getItemId());
-        /*if (userRepository.findAll()
-                .stream()
-                .noneMatch(u -> Objects.equals(u.getId(), userId))) {
-            throw new UserNotFoundException("Нет такого id пользователя");
-        }*/
         User booker = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
         Long id = bookingCreateDto.getItemId();
@@ -50,7 +45,7 @@ public class BookingService {
         if (!item.getAvailable()) {
             throw new InvalidItemDtoException("Вещь нельзя забронировать");
         }
-        if(item.getOwner().getId().equals(userId)){
+        if (item.getOwner().getId().equals(userId)) {
             throw new ItemNotFoundException("Вещь нельзя забронировать у себя");
         }
         Booking newBooking = new Booking();
@@ -63,10 +58,10 @@ public class BookingService {
     }
 
     public BookingDto getBookingById(Long id, Long userId) {
-        bookingRepository.findById(id).orElseThrow(() ->
+        Booking storedBooking = bookingRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Бронирования c id" + id + " нет"));
-        Booking storedBooking = bookingRepository.findById(id).get();
+        //Booking storedBooking = bookingRepository.findById(id).get();
         if (!Objects.equals(userId, storedBooking.getBooker().getId()) &&
                 !Objects.equals(userId, storedBooking.getItem().getOwner().getId())) {
             throw new UserNotFoundException("Нет пользователя с доступом к информации");
@@ -75,7 +70,9 @@ public class BookingService {
     }
 
     public BookingDto updateApproving(Long bookingId, Long userId, Boolean approved) {
-        Booking storedBooking = bookingRepository.findById(bookingId).get();
+        Booking storedBooking = bookingRepository.findById(bookingId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Бронирования c id" + bookingId + " нет"));
         if (!Objects.equals(storedBooking.getItem().getOwner().getId(), userId)) {
             throw new UserNotFoundException("Нет пользователя с доступом к изменению информации статуса бронирования");
         }
@@ -104,19 +101,19 @@ public class BookingService {
                 bookings = bookingRepository.findCurrentByBooker(userStored, LocalDateTime.now());
                 break;
             case PAST:
-                bookings = bookingRepository.findPastByBooker(userStored,LocalDateTime.now());
+                bookings = bookingRepository.findPastByBooker(userStored, LocalDateTime.now());
                 break;
             case FUTURE:
                 bookings = bookingRepository.findFutureByBooker(userStored, LocalDateTime.now());
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored,Booking.BookingStatus.WAITING);
+                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored, Booking.BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored,Booking.BookingStatus.REJECTED);
+                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored, Booking.BookingStatus.REJECTED);
                 break;
             default:
-                throw new  ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
+                throw new ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
                 .map(BookingMapper.INSTANCE::toBookingDto).
@@ -127,7 +124,7 @@ public class BookingService {
         List<Booking> bookings;
         User ownerStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
-        if (itemRepository.findItemByOwnerId(userId).size() == 0){
+        if (itemRepository.findItemByOwnerId(userId).size() == 0) {
             throw new UserNotFoundException("У пользователя нет вещей для аренды");
         }
         Booking.BookingState bookingState = Objects.isNull(state) ?
@@ -140,19 +137,19 @@ public class BookingService {
                 bookings = bookingRepository.findCurrentByOwnerItems(ownerStored, LocalDateTime.now());
                 break;
             case PAST:
-                bookings = bookingRepository.findPastByOwnerItems(ownerStored,LocalDateTime.now());
+                bookings = bookingRepository.findPastByOwnerItems(ownerStored, LocalDateTime.now());
                 break;
             case FUTURE:
                 bookings = bookingRepository.findFutureByOwnerItems(ownerStored, LocalDateTime.now());
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored,Booking.BookingStatus.WAITING);
+                bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored, Booking.BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored,Booking.BookingStatus.REJECTED);
+                bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored, Booking.BookingStatus.REJECTED);
                 break;
             default:
-                throw new  ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
+                throw new ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
                 .map(BookingMapper.INSTANCE::toBookingDto).

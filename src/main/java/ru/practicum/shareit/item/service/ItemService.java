@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.mappers.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemService {
     private final ItemDtoValidator itemDtoValidator;
-
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
@@ -48,23 +47,18 @@ public class ItemService {
         return ItemMapper.INSTANCE.toDTO(itemRepository.save(itemFromDto));
     }
 
-    public ItemDto getItemById(Long id) {
+    public ItemDto getItemById(Long id, Long userId) {
         log.debug("Получен запрос GET /items/{itemId}");
         List<Item> allItems = itemRepository.findAll();
         if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        LocalDateTime start = LocalDateTime.now();
         Item itemWithoutBooking = itemRepository.findById(id).get();
-        //ItemDto itemDtoWithoutBooking = ItemMapper.INSTANCE.toDTO(itemRepository.getReferenceById(id));
-        Booking nextBooking = bookingRepository.findFirstByItemAndStartAfterOrderByStartDesc(itemWithoutBooking, start);
-        BookingDto nextBookingDto = BookingMapper.INSTANCE.toBookingDto(nextBooking);
-        Booking lastBooking = bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(itemWithoutBooking, start);
-        BookingDto lastBookingDto = BookingMapper.INSTANCE.toBookingDto(lastBooking);
-        ItemDto itemDtoWithoutBooking = ItemMapper.INSTANCE.toDTO(itemWithoutBooking);
-        itemDtoWithoutBooking.setLastBooking(lastBookingDto);
-        itemDtoWithoutBooking.setNextBooking(nextBookingDto);
-        return itemDtoWithoutBooking;
+        if (!itemWithoutBooking.getOwner().getId().equals(userId)) {
+            return ItemMapper.INSTANCE.toDTO(itemWithoutBooking);
+        } else {
+            return createItemDtoWithBooking(itemWithoutBooking);
+        }
     }
 
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
@@ -85,11 +79,12 @@ public class ItemService {
         log.debug("Получен запрос GET /items");
         return itemRepository.findItemByOwnerId(userId)
                 .stream()
-                .map(ItemMapper.INSTANCE::toDTO)
+                .map(this::createItemDtoWithBooking)
                 .collect(Collectors.toList());
     }
 
     public Collection<ItemDto> searchItem(String text) {
+        log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
@@ -98,5 +93,17 @@ public class ItemService {
                 .stream()
                 .map(ItemMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    private ItemDto createItemDtoWithBooking(Item itemWithoutBooking) {
+        LocalDateTime start = LocalDateTime.now();
+        ItemDto itemDtoWithoutBooking = ItemMapper.INSTANCE.toDTO(itemWithoutBooking);
+        Booking nextBooking = bookingRepository.findFirstByItemAndStartAfterOrderByStartDesc(itemWithoutBooking, start);
+        BookingItemDto nextBookingItemDto = BookingMapper.INSTANCE.toBookingItemDto(nextBooking);
+        Booking lastBooking = bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(itemWithoutBooking, start);
+        BookingItemDto lastBookingItemDto = BookingMapper.INSTANCE.toBookingItemDto(lastBooking);
+        itemDtoWithoutBooking.setLastBooking(lastBookingItemDto);
+        itemDtoWithoutBooking.setNextBooking(nextBookingItemDto);
+        return itemDtoWithoutBooking;
     }
 }
