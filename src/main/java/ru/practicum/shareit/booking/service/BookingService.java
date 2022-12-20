@@ -36,11 +36,11 @@ public class BookingService {
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
         bookingValidator.validateBookingCreateDto(bookingCreateDto);
         log.info("Создание бронирования вещи {}", bookingCreateDto.getItemId());
-        if (userRepository.findAll()
+        /*if (userRepository.findAll()
                 .stream()
                 .noneMatch(u -> Objects.equals(u.getId(), userId))) {
-            throw new UserNotFoundException("Нет такого id");
-        }
+            throw new UserNotFoundException("Нет такого id пользователя");
+        }*/
         User booker = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
         Long id = bookingCreateDto.getItemId();
@@ -48,6 +48,9 @@ public class BookingService {
                 "Предмета c id" + id + " нет"));
         if (!item.getAvailable()) {
             throw new InvalidItemDtoException("Вещь нельзя забронировать");
+        }
+        if(item.getOwner().getId().equals(userId)){
+            throw new InvalidItemDtoException("Вещь нельзя забронировать у себя");
         }
         Booking newBooking = new Booking();
         newBooking.setStart(bookingCreateDto.getStart());
