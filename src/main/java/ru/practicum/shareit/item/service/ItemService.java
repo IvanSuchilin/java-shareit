@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.mappers.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mappers.ItemMapper;
@@ -13,6 +17,7 @@ import ru.practicum.shareit.item.validator.ItemDtoValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +32,7 @@ public class ItemService {
 
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         itemDtoValidator.validateItemDto(itemDto);
@@ -48,7 +54,17 @@ public class ItemService {
         if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        return ItemMapper.INSTANCE.toDTO(itemRepository.getReferenceById(id));
+        LocalDateTime start = LocalDateTime.now();
+        Item itemWithoutBooking = itemRepository.findById(id).get();
+        //ItemDto itemDtoWithoutBooking = ItemMapper.INSTANCE.toDTO(itemRepository.getReferenceById(id));
+        Booking nextBooking = bookingRepository.findFirstByItemAndStartAfterOrderByStartDesc(itemWithoutBooking, start);
+        BookingDto nextBookingDto = BookingMapper.INSTANCE.toBookingDto(nextBooking);
+        Booking lastBooking = bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(itemWithoutBooking, start);
+        BookingDto lastBookingDto = BookingMapper.INSTANCE.toBookingDto(lastBooking);
+        ItemDto itemDtoWithoutBooking = ItemMapper.INSTANCE.toDTO(itemWithoutBooking);
+        itemDtoWithoutBooking.setLastBooking(lastBookingDto);
+        itemDtoWithoutBooking.setNextBooking(nextBookingDto);
+        return itemDtoWithoutBooking;
     }
 
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {

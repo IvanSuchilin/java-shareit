@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.validator.BookingValidator;
 import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
+import ru.practicum.shareit.exceptions.itemExceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -50,7 +51,7 @@ public class BookingService {
             throw new InvalidItemDtoException("Вещь нельзя забронировать");
         }
         if(item.getOwner().getId().equals(userId)){
-            throw new InvalidItemDtoException("Вещь нельзя забронировать у себя");
+            throw new ItemNotFoundException("Вещь нельзя забронировать у себя");
         }
         Booking newBooking = new Booking();
         newBooking.setStart(bookingCreateDto.getStart());
