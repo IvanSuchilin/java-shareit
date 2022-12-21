@@ -6,6 +6,8 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -21,7 +23,6 @@ import java.util.Objects;
 public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "item_id", updatable = false, nullable = false)
     private Long id;
     @Column(name = "name", nullable = false)
@@ -35,6 +36,8 @@ public class Item implements Serializable {
     private User owner;
     @Column(name = "request_id")
     private Long requestId;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "item")
+    private List<Comment> comments = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

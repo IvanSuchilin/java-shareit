@@ -8,6 +8,8 @@ import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+
 /**
  * TODO Sprint add-controllers.
  */
@@ -24,4 +26,5 @@ public class ItemDto {
     private ItemRequest request;
     private BookingItemDto nextBooking;
     private BookingItemDto lastBooking;
+    private List<CommentDto> comments;
 }
