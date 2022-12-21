@@ -25,7 +25,7 @@ public interface ItemMapper {
     void updateItem(ItemDto itemDto, @MappingTarget Item item);
 
     @Mapping(target = "id", ignore = true)
-    Comment ToComment(CommentDto commentDto);
+    Comment toComment(CommentDto commentDto);
 
     @Mapping(target = "authorName", source = "author.name")
     CommentDto toCommentDto(Comment comment);

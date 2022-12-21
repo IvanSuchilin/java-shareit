@@ -117,8 +117,8 @@ public class BookingService {
                 throw new ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
-                .map(BookingMapper.INSTANCE::toBookingDto).
-                collect(Collectors.toList());
+                .map(BookingMapper.INSTANCE::toBookingDto)
+                .collect(Collectors.toList());
     }
 
     public List<BookingDto> getAllOwnersBooking(Long userId, String state) {
@@ -153,7 +153,7 @@ public class BookingService {
                 throw new ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
-                .map(BookingMapper.INSTANCE::toBookingDto).
-                collect(Collectors.toList());
+                .map(BookingMapper.INSTANCE::toBookingDto)
+                .collect(Collectors.toList());
     }
 }

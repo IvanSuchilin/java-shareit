@@ -63,7 +63,7 @@ public class ItemService {
         }
         Item itemWithoutBooking = itemRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Предмета c id" + id + " нет"));
+                        "Предмета c id" + id + " нет"));
         if (!itemWithoutBooking.getOwner().getId().equals(userId)) {
             return ItemMapper.INSTANCE.toDTO(itemWithoutBooking);
         } else {
@@ -114,11 +114,10 @@ public class ItemService {
                 "Пользователя c id" + userId + " нет"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Предмета c id" + itemId + " нет"));
-        if (!bookingRepository.existsByItemAndAndBookerAndEndBefore
-                (item, author, LocalDateTime.now())) {
+        if (!bookingRepository.existsByItemAndAndBookerAndEndBefore(item, author, LocalDateTime.now())) {
             throw new ValidationFailedException("Бронирование пользователя не завершено или не существует");
         }
-        Comment newComment = ItemMapper.INSTANCE.ToComment(commentDto);
+        Comment newComment = ItemMapper.INSTANCE.toComment(commentDto);
         newComment.setItem(item);
         newComment.setAuthor(author);
         newComment.setCreated(LocalDateTime.now());

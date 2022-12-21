@@ -39,7 +39,7 @@ public class ItemController {
     public ItemDto get(@PathVariable("itemId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
         log.info("Получение информации о вещи id {} пользователем {}", id, userId);
         userService.getUserById(userId);
-        return itemService.getItemById(id , userId);
+        return itemService.getItemById(id, userId);
     }
 
     @PatchMapping("/items/{itemId}")
