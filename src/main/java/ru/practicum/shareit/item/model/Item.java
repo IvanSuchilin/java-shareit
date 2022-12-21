@@ -36,8 +36,6 @@ public class Item implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-    @Column(name = "request_id")
-    private Long requestId;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "item")
     private List<Comment> comments = new ArrayList<>();
 

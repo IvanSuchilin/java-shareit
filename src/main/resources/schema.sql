@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS ITEMS
     DESCRIPTION  CHARACTER VARYING,
     IS_AVALIABLE BOOLEAN,
     OWNER_ID     BIGINT not null,
-    REQUEST_ID   BIGINT not null,
     constraint ITEMS_USERS_USER_ID_FK
         foreign key (OWNER_ID) references USERS
             on update cascade on delete cascade
@@ -61,17 +60,5 @@ CREATE TABLE IF NOT EXISTS BOOKINGS
             on update cascade on delete cascade,
     constraint BOOKINGS_USERS_USER_ID_FK
         foreign key (BOOKER_ID) references USERS
-            on update cascade on delete cascade
-);
-
-CREATE TABLE IF NOT EXISTS REQUESTS
-(
-    REQUEST_ID     BIGINT auto_increment
-        primary key
-        unique,
-    " description" CHARACTER VARYING,
-    REQUESTOR_ID   BIGINT,
-    constraint REQUESTS_USERS_USER_ID_FK
-        foreign key (REQUESTOR_ID) references USERS
             on update cascade on delete cascade
 );
