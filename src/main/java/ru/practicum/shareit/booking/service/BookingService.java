@@ -61,11 +61,11 @@ public class BookingService {
         Booking storedBooking = bookingRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Бронирования c id" + id + " нет"));
-        //Booking storedBooking = bookingRepository.findById(id).get();
         if (!Objects.equals(userId, storedBooking.getBooker().getId()) &&
                 !Objects.equals(userId, storedBooking.getItem().getOwner().getId())) {
             throw new UserNotFoundException("Нет пользователя с доступом к информации");
         }
+        log.info("Получение информации о бронировании вещи id {}", id);
         return BookingMapper.INSTANCE.toBookingDto(storedBooking);
     }
 
@@ -79,6 +79,7 @@ public class BookingService {
         if (!Objects.equals(Booking.BookingStatus.WAITING, storedBooking.getStatus())) {
             throw new ValidationFailedException("Статус бронирования не WAITING - обновление невозможно ");
         }
+        log.info("Изменение статуса бронирования id {}", bookingId);
         if (approved) {
             storedBooking.setStatus(Booking.BookingStatus.APPROVED);
         } else {

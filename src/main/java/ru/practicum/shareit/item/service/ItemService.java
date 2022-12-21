@@ -39,7 +39,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
 
-    private final  CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         itemDtoValidator.validateItemDto(itemDto);
@@ -61,7 +61,9 @@ public class ItemService {
         if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        Item itemWithoutBooking = itemRepository.findById(id).get();
+        Item itemWithoutBooking = itemRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Предмета c id" + id + " нет"));
         if (!itemWithoutBooking.getOwner().getId().equals(userId)) {
             return ItemMapper.INSTANCE.toDTO(itemWithoutBooking);
         } else {
@@ -105,15 +107,15 @@ public class ItemService {
 
 
     public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
-        if (commentDto.getText().isEmpty()){
+        if (commentDto.getText().isEmpty()) {
             throw new ValidationFailedException("Комментарий не может быть пустым");
         }
         User author = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Предмета c id" + itemId + " нет"));
-        if(!bookingRepository.existsByItemAndAndBookerAndEndBefore
-                (item, author, LocalDateTime.now())){
+        if (!bookingRepository.existsByItemAndAndBookerAndEndBefore
+                (item, author, LocalDateTime.now())) {
             throw new ValidationFailedException("Бронирование пользователя не завершено или не существует");
         }
         Comment newComment = ItemMapper.INSTANCE.ToComment(commentDto);

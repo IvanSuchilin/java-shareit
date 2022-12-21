@@ -18,13 +18,10 @@ import java.util.Collection;
 @RequestMapping
 public class UserController {
     private final UserService userService;
-   // private final UserMapper userMapper;
 
     @Autowired
-    public UserController(UserService userService
-            /*, UserMapper userMapper*/) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        //this.userMapper = userMapper;
     }
 
     @GetMapping("/users/{userId}")

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
@@ -20,13 +19,11 @@ import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADE
 @RestController
 @RequestMapping
 public class BookingController {
-    private final ItemService itemService;
     private final UserService userService;
     private final BookingService bookingService;
 
     @Autowired
-    public BookingController(ItemService itemService, UserService userService, BookingService bookingService) {
-        this.itemService = itemService;
+    public BookingController(UserService userService, BookingService bookingService) {
         this.userService = userService;
         this.bookingService = bookingService;
     }
@@ -62,9 +59,8 @@ public class BookingController {
 
     @GetMapping("/bookings/owner")
     public List<BookingDto> getAllToOwner(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                   @RequestParam(name = "state", required = false) String state) {
+                                          @RequestParam(name = "state", required = false) String state) {
         userService.getUserById(userId);
         return bookingService.getAllOwnersBooking(userId, state);
     }
-
 }

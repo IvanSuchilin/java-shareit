@@ -18,5 +18,5 @@ public class BookingValidator {
             log.warn("Отсутствуют корректные данные для создания Booking");
             throw new InvalidBookingDtoException("Отсутствуют необходимые данные для создания Booking");
         }
-}
+    }
 }

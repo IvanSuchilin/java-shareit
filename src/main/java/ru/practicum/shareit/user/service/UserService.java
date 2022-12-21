@@ -28,12 +28,6 @@ public class UserService {
     public User create(User user) {
         userValidator.validateUser(user);
         log.debug("Получен запрос на создание пользователя {}", user.getName());
-        /*if (userRepository.findAll()
-                .stream()
-                .anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
-            throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
-        }*/
-        // return userStorage.createUser(user);
         User saveUser;
         try {
             saveUser = userRepository.save(user);
