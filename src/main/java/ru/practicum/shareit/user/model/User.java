@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * TODO Sprint add-controllers.
@@ -17,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 @Entity
 @Table(schema = "public", name = "users")
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
