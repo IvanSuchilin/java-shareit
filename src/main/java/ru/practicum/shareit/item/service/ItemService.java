@@ -3,16 +3,22 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.mappers.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mappers.ItemMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.validator.ItemDtoValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -32,6 +38,8 @@ public class ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+
+    private final  CommentRepository commentRepository;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         itemDtoValidator.validateItemDto(itemDto);
@@ -93,6 +101,26 @@ public class ItemService {
                 .stream()
                 .map(ItemMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
+        if (commentDto.getText().isEmpty()){
+            throw new ValidationFailedException("Комментарий не может быть пустым");
+        }
+        User author = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Пользователя c id" + userId + " нет"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Предмета c id" + itemId + " нет"));
+        if(!bookingRepository.existsByItemAndAndBookerAndEndBefore
+                (item, author, LocalDateTime.now())){
+            throw new ValidationFailedException("Бронирование пользователя не завершено или не существует");
+        }
+        Comment newComment = ItemMapper.INSTANCE.ToComment(commentDto);
+        newComment.setItem(item);
+        newComment.setAuthor(author);
+        newComment.setCreated(LocalDateTime.now());
+        return ItemMapper.INSTANCE.toCommentDto(commentRepository.save(newComment));
     }
 
     private ItemDto createItemDtoWithBooking(Item itemWithoutBooking) {
