@@ -33,6 +33,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    LocalDateTime now;
 
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
         bookingValidator.validateBookingCreateDto(bookingCreateDto);
@@ -90,6 +91,7 @@ public class BookingService {
 
     public List<BookingDto> getAll(Long userId, String state) {
         List<Booking> bookings;
+        now = LocalDateTime.now();
         User userStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
         Booking.BookingState bookingState = Objects.isNull(state) ?
@@ -99,13 +101,13 @@ public class BookingService {
                 bookings = bookingRepository.findAllByBookerOrderByStartDesc(userStored);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findCurrentByBooker(userStored, LocalDateTime.now());
+                bookings = bookingRepository.findCurrentByBooker(userStored, now);
                 break;
             case PAST:
-                bookings = bookingRepository.findPastByBooker(userStored, LocalDateTime.now());
+                bookings = bookingRepository.findPastByBooker(userStored, now);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findFutureByBooker(userStored, LocalDateTime.now());
+                bookings = bookingRepository.findFutureByBooker(userStored, now);
                 break;
             case WAITING:
                 bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored, Booking.BookingStatus.WAITING);
@@ -123,6 +125,7 @@ public class BookingService {
 
     public List<BookingDto> getAllOwnersBooking(Long userId, String state) {
         List<Booking> bookings;
+        now = LocalDateTime.now();
         User ownerStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Пользователя c id" + userId + " нет"));
         if (itemRepository.findItemByOwnerId(userId).size() == 0) {
@@ -135,13 +138,13 @@ public class BookingService {
                 bookings = bookingRepository.findAllByOwnerItems(ownerStored);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findCurrentByOwnerItems(ownerStored, LocalDateTime.now());
+                bookings = bookingRepository.findCurrentByOwnerItems(ownerStored,  now);
                 break;
             case PAST:
-                bookings = bookingRepository.findPastByOwnerItems(ownerStored, LocalDateTime.now());
+                bookings = bookingRepository.findPastByOwnerItems(ownerStored,  now);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findFutureByOwnerItems(ownerStored, LocalDateTime.now());
+                bookings = bookingRepository.findFutureByOwnerItems(ownerStored,  now);
                 break;
             case WAITING:
                 bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored, Booking.BookingStatus.WAITING);
