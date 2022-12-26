@@ -18,12 +18,10 @@ import java.util.Collection;
 @RequestMapping
 public class UserController {
     private final UserService userService;
-    private final UserMapper userMapper;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userMapper = userMapper;
     }
 
     @GetMapping("/users/{userId}")
@@ -35,7 +33,7 @@ public class UserController {
     @PostMapping("/users")
     public UserDto create(@RequestBody User user) {
         log.info("Создание пользователя {}", user.getName());
-        return userMapper.toDTO(userService.create(user));
+        return UserMapper.INSTANCE.toDto(userService.create(user));
     }
 
     @PatchMapping("/users/{userId}")
