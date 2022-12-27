@@ -14,7 +14,17 @@ CREATE TABLE IF NOT EXISTS USERS
         unique
 );
 
-CREATE TABLE IF NOT EXISTS ITEMS
+create table if not exists REQUESTS
+(
+    REQUEST_ID     BIGINT auto_increment
+        primary key
+        unique,
+    description CHARACTER VARYING,
+    REQUESTER_ID   BIGINT,
+    CREATED        TIMESTAMP WITHOUT TIME ZONE not null
+);
+
+create table ITEMS
 (
     ITEM_ID      BIGINT auto_increment
         primary key
@@ -23,8 +33,12 @@ CREATE TABLE IF NOT EXISTS ITEMS
     DESCRIPTION  CHARACTER VARYING,
     IS_AVALIABLE BOOLEAN,
     OWNER_ID     BIGINT not null,
+    REQUEST_ID   INTEGER default NULL,
     constraint ITEMS_USERS_USER_ID_FK
         foreign key (OWNER_ID) references USERS
+            on update cascade on delete cascade,
+    constraint ITEMS_REQUESTS_ID_FK
+        foreign key (REQUEST_ID) references REQUESTS
             on update cascade on delete cascade
 );
 
@@ -63,12 +77,3 @@ CREATE TABLE IF NOT EXISTS BOOKINGS
             on update cascade on delete cascade
 );
 
-create table if not exists REQUESTS
-(
-    REQUEST_ID     BIGINT auto_increment
-        primary key
-        unique,
-    description CHARACTER VARYING,
-    REQUESTER_ID   BIGINT,
-    CREATED        TIMESTAMP WITHOUT TIME ZONE not null
-);

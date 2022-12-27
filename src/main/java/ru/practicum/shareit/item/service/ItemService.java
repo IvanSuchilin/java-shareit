@@ -13,13 +13,16 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mappers.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.validator.ItemDtoValidator;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -38,10 +41,11 @@ public class ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     private final CommentRepository commentRepository;
 
-    public ItemDto create(Long userId, ItemDto itemDto) {
+    public ItemCreatingDto create(Long userId, ItemCreatingDto itemDto) {
         itemDtoValidator.validateItemDto(itemDto);
         log.debug("Получен на создание вещи {}", itemDto.getName());
         if (userRepository.findAll()
@@ -52,7 +56,13 @@ public class ItemService {
         User owner = userRepository.getReferenceById(userId);
         Item itemFromDto = ItemMapper.INSTANCE.toItem(itemDto);
         itemFromDto.setOwner(owner);
-        return ItemMapper.INSTANCE.toDTO(itemRepository.save(itemFromDto));
+        if(itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Запрса c id" + itemDto.getRequestId() + " нет"));
+            itemFromDto.setItemRequest(itemRequest);
+        }
+        return ItemMapper.INSTANCE.toCreatingDTO(itemRepository.save(itemFromDto));
     }
 
     public ItemDto getItemById(Long id, Long userId) {

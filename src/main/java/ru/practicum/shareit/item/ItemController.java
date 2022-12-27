@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
@@ -29,7 +30,7 @@ public class ItemController {
     }
 
     @PostMapping("/items")
-    public ItemDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody ItemDto itemDto) {
+    public ItemCreatingDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody ItemCreatingDto itemDto) {
         log.info("Создание вещи {}", itemDto.getName());
         userService.getUserById(userId);
         return itemService.create(userId, itemDto);
