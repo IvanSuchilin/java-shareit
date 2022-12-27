@@ -4,20 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto {
-    private Long id;
+public class ItemRequestCreatingDto {
+    @NotNull(message = "Описание запроса вещи не может быть пустым")
     private String description;
-    private User requester;
-    private LocalDateTime created;
 }
