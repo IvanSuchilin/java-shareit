@@ -7,10 +7,13 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestCreatingDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.RequestResponseDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
 
@@ -43,4 +46,19 @@ public class ItemRequestController {
         userService.getUserById(userId);
         return itemRequestService.create(userId, itemRequestCreatingDto);
     }
+
+    @GetMapping("/requests")
+    public List<RequestResponseDto> getUsersRequests(@RequestHeader(REQUEST_HEADER_SHARER) Long userId) {
+        log.info("Получение всех запросов пользователя id {}", userId);
+        userService.getUserById(userId);
+        return itemRequestService.getAllByUserId(userId);
+    }
+
+    @GetMapping("/requests/{requestId}")
+        public RequestResponseDto getRequestById(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                                                 @PathVariable ("requestId") Long id){
+            log.info("Получение данных запроса  id {}", id);
+            userService.getUserById(userId);
+            return itemRequestService.getRequestById(id);
+        }
 }

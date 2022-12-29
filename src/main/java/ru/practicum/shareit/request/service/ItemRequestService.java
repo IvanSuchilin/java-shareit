@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestCreatingDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.RequestResponseDto;
 import ru.practicum.shareit.request.mappers.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
@@ -14,13 +16,16 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemRequestService {
-  private final ItemRequestRepository itemRequestRepository;
-    private final  UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     public ItemRequestDto create(Long userId, ItemRequestCreatingDto itemRequestCreatingDto) {
         User requester = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -29,7 +34,20 @@ public class ItemRequestService {
         itemRequest.setDescription(itemRequestCreatingDto.getDescription());
         itemRequest.setCreated(LocalDateTime.now());
         itemRequest.setRequester(requester);
-        ItemRequestDto itemRequestDto = ItemRequestMapper.INSTANCE.toItemRequestDto(itemRequestRepository.save(itemRequest));
-        return itemRequestDto;
+        return ItemRequestMapper.INSTANCE.toItemRequestDto(itemRequestRepository.save(itemRequest));
+    }
+
+    public List<RequestResponseDto> getAllByUserId(Long userId) {
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId);
+        return itemRequests.stream()
+                .map(ItemRequestMapper.INSTANCE::toRequestResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public RequestResponseDto getRequestById(Long id) {
+        ItemRequest itemRequest = itemRequestRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Запроса c id" + id + " нет"));
+        return ItemRequestMapper.INSTANCE.toRequestResponseDto(itemRequest);
     }
 }
