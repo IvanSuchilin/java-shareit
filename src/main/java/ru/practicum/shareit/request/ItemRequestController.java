@@ -2,6 +2,7 @@ package ru.practicum.shareit.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.service.ItemService;
@@ -12,8 +13,8 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
-
 import java.util.List;
+import java.util.Optional;
 
 import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
 
@@ -22,6 +23,7 @@ import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADE
  */
 @Slf4j
 @RestController
+@Validated
 @RequestMapping
 public class ItemRequestController {
     private final UserService userService;
@@ -61,4 +63,14 @@ public class ItemRequestController {
             userService.getUserById(userId);
             return itemRequestService.getRequestById(id);
         }
+
+    @GetMapping("/requests/all")
+    public List<RequestResponseDto> getAllRequestsWithPagination(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                                                   @RequestParam (defaultValue = "0", required = false) int from,
+                                                   @RequestParam (defaultValue = "20", required = false) int size){
+        log.info("Получение всех запросов  c пагинацией");
+        userService.getUserById(userId);
+        return itemRequestService.getAllRequestsWithPagination(from, size, userId);
+    }
+
 }

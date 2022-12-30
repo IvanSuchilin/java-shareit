@@ -2,9 +2,12 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestCreatingDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -49,5 +52,18 @@ public class ItemRequestService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Запроса c id" + id + " нет"));
         return ItemRequestMapper.INSTANCE.toRequestResponseDto(itemRequest);
+    }
+    public List<RequestResponseDto> getAllRequestsWithPagination(int from,int size, Long userId) {
+            if (from == 0 && size == 0) {
+                throw new BadRequestException("Не заданы параметры пагинации");
+            }
+            if (from < 0 || size < 0) {
+                throw new BadRequestException("Неверно заданы параметры пагинации");
+            }
+            Pageable pageable = PageRequest.of(from, size);
+            List<ItemRequest> requests = itemRequestRepository.findAllWithPagination(pageable, userId);
+            return requests.stream()
+                    .map(ItemRequestMapper.INSTANCE::toRequestResponseDto)
+                    .collect(Collectors.toList());
     }
 }
