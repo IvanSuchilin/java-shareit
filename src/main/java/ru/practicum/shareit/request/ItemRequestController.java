@@ -13,8 +13,9 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
-import java.util.Optional;
 
 import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
 
@@ -66,8 +67,8 @@ public class ItemRequestController {
 
     @GetMapping("/requests/all")
     public List<RequestResponseDto> getAllRequestsWithPagination(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                                   @RequestParam (defaultValue = "0", required = false) int from,
-                                                   @RequestParam (defaultValue = "20", required = false) int size){
+                                                   @PositiveOrZero @RequestParam (defaultValue = "0", required = false) int from,
+                                                   @Positive @RequestParam (defaultValue = "20", required = false) int size){
         log.info("Получение всех запросов  c пагинацией");
         userService.getUserById(userId);
         return itemRequestService.getAllRequestsWithPagination(from, size, userId);

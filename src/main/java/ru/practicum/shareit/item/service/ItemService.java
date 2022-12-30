@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -95,21 +96,21 @@ public class ItemService {
         }
     }
 
-    public Collection<ItemDto> getAllUsersItems(Long userId) {
+    public Collection<ItemDto> getAllUsersItems(Long userId, Pageable pageable) {
         log.debug("Получен запрос GET /items");
-        return itemRepository.findItemByOwnerId(userId)
+        return itemRepository.findItemByOwnerId(userId, pageable)
                 .stream()
                 .map(this::createItemDtoWithBooking)
                 .collect(Collectors.toList());
     }
 
-    public Collection<ItemDto> searchItem(String text) {
+    public Collection<ItemDto> searchItem(String text, Pageable pageable) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
         String lowText = text.toLowerCase();
-        return itemRepository.findByText(lowText)
+        return itemRepository.findByText(lowText, pageable)
                 .stream()
                 .map(ItemMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
