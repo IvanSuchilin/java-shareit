@@ -25,7 +25,7 @@ public class UserService {
     private final UserValidator userValidator;
     private final UserDtoValidator userDtoValidator;
 
-    public User create(User user) {
+    public UserDto create(User user) {
         userValidator.validateUser(user);
         log.debug("Получен запрос на создание пользователя {}", user.getName());
         User saveUser;
@@ -34,7 +34,7 @@ public class UserService {
         } catch (Throwable e) {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }
-        return saveUser;
+        return UserMapper.INSTANCE.toDto(saveUser);
     }
 
     public UserDto getUserById(Long id) {

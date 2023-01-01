@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,16 +25,17 @@ import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADE
 @Slf4j
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping
 public class BookingController {
     private final UserService userService;
     private final BookingService bookingService;
 
-    @Autowired
+    /*@Autowired
     public BookingController(UserService userService, BookingService bookingService) {
         this.userService = userService;
         this.bookingService = bookingService;
-    }
+    }*/
 
     @PostMapping("/bookings")
     public BookingDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody BookingCreateDto bookingCreateDto) {
