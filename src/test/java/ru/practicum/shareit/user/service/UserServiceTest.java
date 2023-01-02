@@ -16,6 +16,10 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.validator.UserDtoValidator;
 import ru.practicum.shareit.user.validator.UserValidator;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -108,9 +112,25 @@ class UserServiceTest {
 
     @Test
     void delete() {
+        Long userId = 1L;
+       // when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.delete(userId);
+        verify(userRepository, times(1))
+                .deleteById(userId);
     }
 
     @Test
     void getAllUsers() {
+        User user = new User(1L, "Test", "test@mail.ru");
+        List<User> storedUsers = new ArrayList<>();
+        storedUsers.add(user);
+        when(userRepository.findAll()).thenReturn(storedUsers);
+
+        Collection<UserDto> users = userService.getAllUsers();
+
+        assertEquals(users.size(), storedUsers.size());
+        assertEquals(1, users.size());
+        
     }
+
 }
