@@ -20,15 +20,13 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-
 class UserControllerTest {
     private UserDto userDto;
     private UserDto user2Dto;
@@ -42,7 +40,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         userDto = new UserDto(1L, "Test", "Test@mail.ru");
-        // user2Dto = new UserDto(2L, "Test2", "Test2@mail.ru");
+        user2Dto = new UserDto(2L, "Test2", "Test2@mail.ru");
     }
 
     @SneakyThrows
@@ -52,9 +50,9 @@ class UserControllerTest {
                 .andExpect(status().isOk());
         verify(userService).getUserById(1L);
     }
-
+    @SneakyThrows
     @Test
-    void create() throws Exception {
+    void createUserTest() {
         when(userService.create(any()))
                 .thenReturn(userDto);
 
@@ -68,20 +66,45 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"));
 
     }
-
+    @SneakyThrows
     @Test
-    void findAll() throws Exception {
+    void findAllUsersTest() {
         List<UserDto> users = new ArrayList<>();
         users.add(userDto);
-        //users.add(user2Dto);
+        users.add(user2Dto);
         when(userService.getAllUsers())
                 .thenReturn(users);
 
         mockMvc.perform(get("/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(userDto.getId()), Long.class))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(userDto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].email", is(userDto.getEmail())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].email", is(userDto.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].name", is(user2Dto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].email", is(user2Dto.getEmail())));
+    }
+    @SneakyThrows
+    @Test
+    void updateUserTest() {
+        when(userService.update(anyLong(), any())).thenReturn(userDto);
+
+        mockMvc.perform(patch("/users/{userId}", userDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"));
+    }
+    @Test
+    void deleteTest() throws Exception {
+        mockMvc.perform(delete("/users/{userId}", userDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(userService,times(1))
+                .delete(userDto.getId());
     }
 }
