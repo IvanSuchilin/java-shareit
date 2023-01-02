@@ -19,6 +19,7 @@ import ru.practicum.shareit.user.validator.UserValidator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,7 +41,7 @@ class UserServiceTest {
     @Test
     void createUser() {
         User newUser = new User(null, "Test", "test@mail.ru");
-        when (userRepository.save(newUser)).thenReturn(newUser);
+        when(userRepository.save(newUser)).thenReturn(newUser);
         UserDto userStored = UserMapper.INSTANCE.toDto(userRepository.save(newUser));
 
         assertEquals(newUser.getName(), userStored.getName());
@@ -48,44 +49,44 @@ class UserServiceTest {
     }
 
     @Test
-    void createWrongUserName(){
+    void createWrongUserName() {
         User newWrongUser = new User(null, "", "test@mail.ru");
         doThrow(UserEmptyNameException.class)
-        .when(userValidator).validateUser(newWrongUser);
+                .when(userValidator).validateUser(newWrongUser);
 
         assertThrows(UserEmptyNameException.class,
-                ()->userService.create(newWrongUser));
+                () -> userService.create(newWrongUser));
         verify(userRepository, never()).save(newWrongUser);
         verify(userRepository, times(0)).save(newWrongUser);
     }
 
     @Test
-    void createWrongUserEmail(){
+    void createWrongUserEmail() {
         User newWrongUser = new User(null, "Test", "testmail.ru");
         doThrow(InvalidEmailException.class)
                 .when(userValidator).validateUser(newWrongUser);
 
         assertThrows(InvalidEmailException.class,
-                ()->userService.create(newWrongUser));
+                () -> userService.create(newWrongUser));
         verify(userRepository, never()).save(newWrongUser);
         verify(userRepository, times(0)).save(newWrongUser);
     }
 
     @Test
-    void createAlreadyExistUserEmail(){
+    void createAlreadyExistUserEmail() {
         User newWrongUser = new User(null, "Test", "test@mail.ru");
         doThrow(EmailAlreadyExistException.class)
                 .when(userRepository).save(newWrongUser);
 
         assertThrows(EmailAlreadyExistException.class,
-                ()->userService.create(newWrongUser));
+                () -> userService.create(newWrongUser));
         verify(userRepository, times(1)).save(newWrongUser);
     }
 
     @Test
     void getUserById() {
         User user = new User(1L, "Tes", "test@mail");
-        when (userRepository.getReferenceById(user.getId()))
+        when(userRepository.getReferenceById(user.getId()))
                 .thenReturn(user);
 
         User storedUser = userRepository.getReferenceById(user.getId());
@@ -101,7 +102,7 @@ class UserServiceTest {
                 .when(userRepository).findAll();
 
         assertThrows(UserNotFoundException.class,
-                ()->userService.getUserById(user.getId()));
+                () -> userService.getUserById(user.getId()));
         verify(userRepository, never()).getReferenceById(user.getId());
         verify(userRepository, times(0)).getReferenceById(user.getId());
     }
@@ -113,7 +114,7 @@ class UserServiceTest {
     @Test
     void delete() {
         Long userId = 1L;
-       // when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        // when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.delete(userId);
         verify(userRepository, times(1))
                 .deleteById(userId);
@@ -130,7 +131,21 @@ class UserServiceTest {
 
         assertEquals(users.size(), storedUsers.size());
         assertEquals(1, users.size());
-        
+
     }
 
+    @Test
+    void updateUser() {
+        User oldUser = new User(1L, "oldName", "oldEmail@mail.ru");
+        User newUser = new User();
+        newUser.setName("newName");
+        newUser.setEmail("newEmail@mail.ru");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(oldUser));
+        when(userRepository.save(any())).thenReturn(newUser);
+
+        UserDto actualUser = userService.update(oldUser.getId(), UserMapper.INSTANCE.toDto(newUser));
+
+        assertEquals(newUser.getName(), actualUser.getName());
+        assertEquals(newUser.getEmail(), actualUser.getEmail());
+    }
 }

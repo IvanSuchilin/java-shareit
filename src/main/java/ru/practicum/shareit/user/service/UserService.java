@@ -61,7 +61,8 @@ public class    UserService {
             User stored = userRepository.findById(id)
                     .orElseThrow(ChangeSetPersister.NotFoundException::new);
             UserMapper.INSTANCE.updateUser(userDto, stored);
-            return UserMapper.INSTANCE.toDto(userRepository.save(stored));
+            User actualUser = userRepository.save(stored);
+            return UserMapper.INSTANCE.toDto(actualUser);
         } catch (ChangeSetPersister.NotFoundException e) {
             throw new UserNotFoundException("Нет такого пользователя");
         }
