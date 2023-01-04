@@ -10,14 +10,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ItemControllerTest {
     private ItemDto itemDto;
+    private CommentDto commentDto;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -44,6 +48,7 @@ class ItemControllerTest {
         itemDto.setId(1L);
         itemDto.setName("nameDto");
         itemDto.setDescription("descriptionDto");
+        commentDto = new CommentDto(1L, "commentText", "userName", LocalDateTime.now());
     }
 
     @SneakyThrows
@@ -78,9 +83,20 @@ class ItemControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("descriptionDto"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("nameDto"));
     }
-
+    @SneakyThrows
     @Test
-    void patch() {
+    void patchTest() {
+        when(userService.getUserById(1L)).thenReturn(new UserDto());
+        when(itemService.getItemById(1L, 1L)).thenReturn(itemDto);
+        when(itemService.update(anyLong(), anyLong(), any())).thenReturn(itemDto);
+        mockMvc.perform(MockMvcRequestBuilders.patch("/items/{itemId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1)
+                .content(objectMapper.writeValueAsString(itemDto)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("descriptionDto"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("nameDto"));
     }
 
     @Test
@@ -90,8 +106,19 @@ class ItemControllerTest {
     @Test
     void searchItem() {
     }
-
+    @SneakyThrows
     @Test
     void createComment() {
+        when(userService.getUserById(1L)).thenReturn(new UserDto());
+        when(itemService.createComment(anyLong(), anyLong(), any())).thenReturn(commentDto);
+
+        mockMvc.perform(post("/items/{itemId}/comment", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1)
+                        .content(objectMapper.writeValueAsString(commentDto)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.authorName").value("userName"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.text").value("commentText"));
     }
 }
