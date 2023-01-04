@@ -20,9 +20,12 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -98,17 +101,41 @@ class ItemControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("descriptionDto"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("nameDto"));
     }
-
+    @SneakyThrows
     @Test
     void findAllUsersItems() {
-    }
+        when(userService.getUserById(1L)).thenReturn(new UserDto());
+        Collection<ItemDto> items = new ArrayList<>();
+        items.add(itemDto);
+        when(itemService.getAllUsersItems(anyLong(), any())).thenReturn(items);
 
-    @Test
-    void searchItem() {
+        mockMvc.perform(get("/items")
+                .header("X-Sharer-User-Id", 1))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(itemDto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(itemDto.getDescription())));
     }
     @SneakyThrows
     @Test
-    void createComment() {
+    void searchItemTest() {
+        when(userService.getUserById(1L)).thenReturn(new UserDto());
+        Collection<ItemDto> items = new ArrayList<>();
+        items.add(itemDto);
+        when(itemService.searchItem(eq(itemDto.getName()), any())).thenReturn(items);
+
+        mockMvc.perform(get("/items/search")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("text", "nameDto"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(itemDto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(itemDto.getDescription())));
+    }
+
+    @SneakyThrows
+    @Test
+    void createCommentTest() {
         when(userService.getUserById(1L)).thenReturn(new UserDto());
         when(itemService.createComment(anyLong(), anyLong(), any())).thenReturn(commentDto);
 
