@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.exceptions.userExceptions.EmailAlreadyExistException;
+import ru.practicum.shareit.exceptions.userExceptions.InvalidEmailException;
+import ru.practicum.shareit.exceptions.userExceptions.UserEmptyNameException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserServiceTestInt {
     private static User user1;
     private static User user2;
+    private static User wrongUser;
 
     @Autowired
     private  UserService userService;
@@ -32,6 +35,7 @@ class UserServiceTestInt {
     public static void setup() {
         user1 = new User(null, "name1", "emailtest1@mail.ru");
         user2 = new User(null, "name2", "email2test@mail.ru");
+        wrongUser =  new User(null, "", "");
     }
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
@@ -41,9 +45,18 @@ class UserServiceTestInt {
         assertEquals(storedUserDto.getId(),1L);
         assertEquals(storedUserDto.getName(), "name1");
         assertEquals(storedUserDto.getEmail(), "emailtest1@mail.ru");
-
     }
 
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createUserEmailAlreadyExist() {
+        userService.create(user1);
+        User newUser = new User(null, "name1", "emailtest1@mail.ru");
+
+        EmailAlreadyExistException thrown = Assertions.assertThrows(EmailAlreadyExistException.class,
+                () -> userService.create(newUser));
+        Assertions.assertEquals("Пользователь с такой почтой уже существует", thrown.getMessage());
+    }
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
@@ -74,7 +87,17 @@ class UserServiceTestInt {
         UserDto storedUser = userService.update(1L, updatedUser);
 
         assertEquals(storedUser.getName(), "updatedName");
+    }
 
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void updateWithWrongEmail() {
+        userService.create(user1);
+        UserDto updatedUser = new UserDto(null, "updatedName", "mail");
+
+        InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
+                () -> userService.update(1L, updatedUser));
+        Assertions.assertEquals("Адрес электронной должен содержать символ @",thrown.getMessage());
     }
 
     @Test
@@ -97,6 +120,23 @@ class UserServiceTestInt {
         UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
                 () -> userService.update(1L, updatedUser));
         Assertions.assertEquals("Нет такого пользователя", thrown.getMessage());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createWithEmptyEmail() {
+        InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
+                () -> userService.create(wrongUser));
+        Assertions.assertEquals("Адрес электронной почты не может быть пустым и должен содержать символ @", thrown.getMessage());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createWithEmptyName() {
+        wrongUser.setEmail("e@mail");
+        UserEmptyNameException thrown = Assertions.assertThrows(UserEmptyNameException.class,
+                () -> userService.create(wrongUser));
+        Assertions.assertEquals("Имя не может быть пустым", thrown.getMessage());
     }
 
     @Test

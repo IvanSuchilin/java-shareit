@@ -46,7 +46,7 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void getUserByIdTest() {
-        mockMvc.perform(get("/users/{userId}", 1L))
+        mockMvc.perform(get("/users/{user   Id}", 1L))
                 .andExpect(status().isOk());
         verify(userService).getUserById(1L);
     }
@@ -56,7 +56,6 @@ class UserControllerTest {
         when(userService.create(any()))
                 .thenReturn(userDto);
 
-        //String result =
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
@@ -64,7 +63,6 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"));
-
     }
     @SneakyThrows
     @Test
