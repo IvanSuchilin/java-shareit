@@ -148,4 +148,16 @@ class UserServiceTest {
         assertEquals(newUser.getName(), actualUser.getName());
         assertEquals(newUser.getEmail(), actualUser.getEmail());
     }
+
+    @Test
+    void updateUserEmailAlreadyExist(){
+        User oldUser = new User(1L, "oldName", "oldEmail@mail.ru");
+        User newUser = new User();
+        newUser.setName("newName");
+        newUser.setEmail("newEmail@mail.ru");
+        doThrow(UserNotFoundException.class)
+                .when(userRepository).findById(any());
+        assertThrows(UserNotFoundException.class,
+                () -> userService.update(oldUser.getId(), UserMapper.INSTANCE.toDto(newUser)));
+    }
 }

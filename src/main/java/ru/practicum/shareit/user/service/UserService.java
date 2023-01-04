@@ -44,7 +44,7 @@ public class    UserService {
                 .noneMatch(u -> Objects.equals(u.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        return UserMapper.INSTANCE.toDto(userRepository.getReferenceById(id));
+        return UserMapper.INSTANCE.toDto(userRepository.findById(id).get());
     }
 
     public UserDto update(Long id, UserDto userDto) {
