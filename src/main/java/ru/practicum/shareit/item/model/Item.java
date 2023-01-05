@@ -40,7 +40,7 @@ public class Item implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "request_id")
     private ItemRequest itemRequest;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "item")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "item")
     private List<Comment> comments = new ArrayList<>();
 
     @Override

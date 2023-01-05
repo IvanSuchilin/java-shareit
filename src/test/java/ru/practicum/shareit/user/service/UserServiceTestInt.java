@@ -39,7 +39,7 @@ class UserServiceTestInt {
     }
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void create() {
+    void createTest() {
         UserDto storedUserDto = userService.create(user1);
 
         assertEquals(storedUserDto.getId(),1L);
@@ -49,7 +49,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void createUserEmailAlreadyExist() {
+    void createUserEmailAlreadyExistTest() {
         userService.create(user1);
         User newUser = new User(null, "name1", "emailtest1@mail.ru");
 
@@ -60,7 +60,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void getUserById() {
+    void getUserByIdTest() {
         userService.create(user1);
         UserDto storedUser = userService.getUserById(1L);
 
@@ -71,7 +71,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void getUserWrongId() {
+    void getUserWrongIdTest() {
 
         UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
                 () -> userService.getUserById(1L));
@@ -80,7 +80,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void update() {
+    void updateTest() {
         userService.create(user1);
         UserDto updatedUser = new UserDto(null, "updatedName", null);
 
@@ -91,7 +91,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void updateWithWrongEmail() {
+    void updateWithWrongEmailTest() {
         userService.create(user1);
         UserDto updatedUser = new UserDto(null, "updatedName", "mail");
 
@@ -102,7 +102,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void updateEmailAlreadyExist() {
+    void updateEmailAlreadyExistTest() {
         userService.create(user1);
         userService.create(user2);
         UserDto updatedUser = new UserDto(null,  null, "emailtest1@mail.ru");
@@ -114,7 +114,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void updateWrongUser() {
+    void updateWrongUserTest() {
         UserDto updatedUser = new UserDto(null,  null, "e@mail.ru");
 
         UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
@@ -124,7 +124,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void createWithEmptyEmail() {
+    void createWithEmptyEmailTest() {
         InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
                 () -> userService.create(wrongUser));
         Assertions.assertEquals("Адрес электронной почты не может быть пустым и должен содержать символ @", thrown.getMessage());
@@ -132,7 +132,7 @@ class UserServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void createWithEmptyName() {
+    void createWithEmptyNameTest() {
         wrongUser.setEmail("e@mail");
         UserEmptyNameException thrown = Assertions.assertThrows(UserEmptyNameException.class,
                 () -> userService.create(wrongUser));
@@ -140,7 +140,7 @@ class UserServiceTestInt {
     }
 
     @Test
-    void delete() {
+    void deleteTest() {
         userService.create(user1);
         userService.create(user2);
 
@@ -151,7 +151,7 @@ class UserServiceTestInt {
     }
 
     @Test
-    void getAllUsers() {
+    void getAllUsersTest() {
         userService.create(user1);
         userService.create(user2);
 

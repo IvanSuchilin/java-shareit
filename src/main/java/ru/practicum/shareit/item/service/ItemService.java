@@ -60,7 +60,7 @@ public class ItemService {
         if(itemDto.getRequestId() != null) {
             ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Запрса c id" + itemDto.getRequestId() + " нет"));
+                            "Запроса c id" + itemDto.getRequestId() + " нет"));
             itemFromDto.setItemRequest(itemRequest);
         }
         return ItemMapper.INSTANCE.toCreatingDTO(itemRepository.save(itemFromDto));
@@ -69,9 +69,9 @@ public class ItemService {
     public ItemDto getItemById(Long id, Long userId) {
         log.debug("Получен запрос GET /items/{itemId}");
         List<Item> allItems = itemRepository.findAll();
-        if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
+        /*if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
-        }
+        }*/
         Item itemWithoutBooking = itemRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Предмета c id" + id + " нет"));
@@ -83,7 +83,7 @@ public class ItemService {
     }
 
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
-        if (!itemRepository.getReferenceById(itemId).getOwner().getId().equals(userId)) {
+        if (!itemRepository.findById(itemId).get().getOwner().getId().equals(userId)) {
             throw new UserNotFoundException("Нет такого владельца вещи");
         }
         try {
