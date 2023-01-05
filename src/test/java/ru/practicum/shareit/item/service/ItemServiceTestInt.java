@@ -9,7 +9,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.dto.BookingCreateDto;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestCreatingDto;
@@ -17,7 +21,9 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -35,6 +41,9 @@ class ItemServiceTestInt {
     private ItemService itemService;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BookingService bookingService;
 
     @Autowired
     private ItemRequestService itemRequestService;
@@ -176,8 +185,8 @@ class ItemServiceTestInt {
         assertEquals("updName", updated.getName());
     }
 
-
     @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllUsersItemsTests() {
         userService.create(user1);
         itemCreatingDto =
@@ -189,10 +198,91 @@ class ItemServiceTestInt {
     }
 
     @Test
-    void searchItem() {
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void searchItemTest() {
+        userService.create(user1);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        List<ItemDto> items = (List<ItemDto>) itemService.searchItem("itemName", null);
+
+        assertEquals(1, items.size());
+        assertEquals("itemName", items.get(0).getName());
     }
 
     @Test
-    void createComment() {
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void searchItemEmptyTextTest() {
+        userService.create(user1);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        List<ItemDto> items = (List<ItemDto>) itemService.searchItem("", null);
+
+        assertEquals(0, items.size());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createEmptyCommentTest() {
+        userService.create(user1);
+        userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        CommentDto commentDto = new CommentDto(null, "", user2.getName(), LocalDateTime.now());
+
+        ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
+                () -> itemService.createComment(2L, 1L, commentDto));
+        Assertions.assertEquals("Комментарий не может быть пустым", thrown.getMessage());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createWrongItemIdCommentTest() {
+        userService.create(user1);
+        userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        CommentDto commentDto = new CommentDto(null, "comment", user2.getName(), LocalDateTime.now());
+
+        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+                () -> itemService.createComment(2L, 10L, commentDto));
+        Assertions.assertEquals("Предмета c id10 нет", thrown.getReason());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createWrongBookingTimeCommentTest() {
+        userService.create(user1);
+        userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        CommentDto commentDto = new CommentDto(null, "comment", user2.getName(), LocalDateTime.now());
+
+        ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
+                () -> itemService.createComment(2L, 1L, commentDto));
+        Assertions.assertEquals("Бронирование пользователя не завершено или не существует", thrown.getMessage());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createCommentTest() {
+        userService.create(user1);
+        userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        bookingService.create(2L,
+                new BookingCreateDto(1L,LocalDateTime.now(),
+                        LocalDateTime.now().plusNanos(1L), user2));
+        CommentDto commentDto = new CommentDto(null, "comment", user2.getName(),
+                LocalDateTime.of(2023,3,2,5,05,5));
+
+        CommentDto stored = itemService.createComment(2L, 1L, commentDto);
+
+        assertEquals("comment", stored.getText());
     }
 }

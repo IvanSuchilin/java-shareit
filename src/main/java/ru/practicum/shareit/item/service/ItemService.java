@@ -112,8 +112,7 @@ public class ItemService {
         if (commentDto.getText().isEmpty()) {
             throw new ValidationFailedException("Комментарий не может быть пустым");
         }
-        User author = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Пользователя c id" + userId + " нет"));
+        User author = userRepository.findById(userId).get();
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Предмета c id" + itemId + " нет"));
         if (!bookingRepository.existsByItemAndAndBookerAndEndBefore(item, author, LocalDateTime.now())) {
