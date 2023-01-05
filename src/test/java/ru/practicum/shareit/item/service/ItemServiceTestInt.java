@@ -17,7 +17,10 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -39,8 +42,7 @@ class ItemServiceTestInt {
     @BeforeAll
     public static void setup() {
         user1 = new User(null, "name1", "emailtest1@mail.ru");
-        itemCreatingDto =
-                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+
         itemRequestCreatingDto = new ItemRequestCreatingDto();
         user2 = new User(null, "name2", "email2test@mail.ru");
        // wrongUser =  new User(null, "", "");
@@ -61,7 +63,9 @@ class ItemServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void createTestWithWrongUser() {
+    void createTestWithWrongUserTest() {
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
                 () -> itemService.create(1L, itemCreatingDto));
         Assertions.assertEquals("Нет такого id", thrown.getMessage());
@@ -69,12 +73,15 @@ class ItemServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void createTestWithWrongRequest() {
+    void createTestWithWrongRequestTest() {
         userService.create(user1);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemCreatingDto.setRequestId(1L);
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> itemService.create(1L, itemCreatingDto));
         Assertions.assertEquals("Запроса c id1 нет", thrown.getReason());
+        Assertions.assertEquals(NOT_FOUND, thrown.getStatus());
     }
 
 
@@ -83,6 +90,8 @@ class ItemServiceTestInt {
     void getItemByIdTest() {
         userService.create(user1);
         userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
 
         ItemDto stored = itemService.getItemById(1L,2L);
@@ -94,8 +103,26 @@ class ItemServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void getItemByIdTestWrongId() {
+    void getItemByIdTestItemWithBookingTest() {
         userService.create(user1);
+        userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+
+        ItemDto stored = itemService.getItemById(1L,1L);
+
+        assertEquals(stored.getId(), 1L);
+        assertEquals(stored.getName(), "itemName");
+        assertEquals(stored.getAvailable(), true);
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getItemByIdTestWrongIdTest() {
+        userService.create(user1);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> itemService.getItemById(10L,1L));
@@ -104,9 +131,11 @@ class ItemServiceTestInt {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void update() {
+    void updateWrongOwnerTest() {
         userService.create(user1);
         userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
         ItemDto itemDtoUpd = new ItemDto();
         itemDtoUpd.setName("updName");
@@ -117,7 +146,46 @@ class ItemServiceTestInt {
     }
 
     @Test
-    void getAllUsersItems() {
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void updateWrongIdTest() {
+        userService.create(user1);
+        userService.create(user2);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        ItemDto itemDtoUpd = new ItemDto();
+        itemDtoUpd.setName("updName");
+
+        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+                () -> itemService.update(10L, 2L, itemDtoUpd));
+        Assertions.assertEquals("Предмета c id10 нет", thrown.getReason());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void updateTest() {
+        userService.create(user1);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        ItemDto itemDtoUpd = new ItemDto();
+        itemDtoUpd.setName("updName");
+
+        ItemDto updated = itemService.update(1L, 1L, itemDtoUpd);
+
+        assertEquals("updName", updated.getName());
+    }
+
+
+    @Test
+    void getAllUsersItemsTests() {
+        userService.create(user1);
+        itemCreatingDto =
+                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
+        itemService.create(1L, itemCreatingDto);
+        Collection<ItemDto> items = itemService.getAllUsersItems(1L,null);
+
+        assertEquals(1, items.size());
     }
 
     @Test

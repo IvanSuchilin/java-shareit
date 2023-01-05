@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -68,10 +66,6 @@ public class ItemService {
 
     public ItemDto getItemById(Long id, Long userId) {
         log.debug("Получен запрос GET /items/{itemId}");
-        List<Item> allItems = itemRepository.findAll();
-        /*if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
-            throw new UserNotFoundException("Нет такого id");
-        }*/
         Item itemWithoutBooking = itemRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Предмета c id" + id + " нет"));
@@ -83,17 +77,14 @@ public class ItemService {
     }
 
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
+        Item stored = itemRepository.findById(itemId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Предмета c id" + itemId + " нет"));
         if (!itemRepository.findById(itemId).get().getOwner().getId().equals(userId)) {
             throw new UserNotFoundException("Нет такого владельца вещи");
         }
-        try {
-            Item stored = itemRepository.findById(itemId)
-                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
             ItemMapper.INSTANCE.updateItem(itemDto, stored);
             return ItemMapper.INSTANCE.toDTO(itemRepository.save(stored));
-        } catch (ChangeSetPersister.NotFoundException e) {
-            throw new UserNotFoundException("Нет такой вещи");
-        }
     }
 
     public Collection<ItemDto> getAllUsersItems(Long userId, Pageable pageable) {
