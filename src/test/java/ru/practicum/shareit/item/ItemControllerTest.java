@@ -57,7 +57,7 @@ class ItemControllerTest {
     @SneakyThrows
     @Test
     void createItemTest() {
-        ItemDto itemDto = new ItemDto();
+        //ItemDto itemDto = new ItemDto();
         itemDto.setDescription("description");
         itemDto.setName("name");
         ItemCreatingDto itemCreatingDto =

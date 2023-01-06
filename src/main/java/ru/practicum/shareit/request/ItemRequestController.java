@@ -73,5 +73,4 @@ public class ItemRequestController {
         userService.getUserById(userId);
         return itemRequestService.getAllRequestsWithPagination(from, size, userId);
     }
-
 }
