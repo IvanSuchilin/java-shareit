@@ -18,18 +18,26 @@ class UserValidatorTest {
     }
 
     @Test
-    void validateUserTestWithEmptyName(){
+    void validateUserTestWithEmptyName() {
         User user = new User(1L, "", "@mail");
         UserEmptyNameException thrown = Assertions.assertThrows(UserEmptyNameException.class,
                 () -> userValidator.validateUser(user));
-        Assertions.assertEquals("Имя не может быть пустым" , thrown.getMessage());
+        Assertions.assertEquals("Имя не может быть пустым", thrown.getMessage());
     }
 
     @Test
-    void validateUserTestWithEmptyEmail(){
+    void validateUserTestWithEmptyEmail() {
         User user = new User(1L, "name", "");
         InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
                 () -> userValidator.validateUser(user));
-        Assertions.assertEquals("Адрес электронной почты не может быть пустым и должен содержать символ @" , thrown.getMessage());
+        Assertions.assertEquals("Адрес электронной почты не может быть пустым и должен содержать символ @", thrown.getMessage());
+    }
+
+    @Test
+    void validateUserTestWithWrongEmail() {
+        User user = new User(1L, "name", "email");
+        InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
+                () -> userValidator.validateUser(user));
+        Assertions.assertEquals("Адрес электронной почты не может быть пустым и должен содержать символ @", thrown.getMessage());
     }
 }

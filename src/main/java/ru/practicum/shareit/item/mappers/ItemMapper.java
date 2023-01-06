@@ -18,12 +18,9 @@ public interface ItemMapper {
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
 
     ItemDto toDTO(Item item);
-   /*@Mapping(target = "requestId", source = "itemRequest.id")
-    @Mapping(target = "ownerId", source = "owner.id")
-    ResponseItemDto toResponseItemDTO(Item item);*/
 
-    Item toItem(ItemDto itemDto);
     Item toItem(ItemCreatingDto itemDto);
+
     @Mapping(target = "requestId", source = "itemRequest.id")
     ItemCreatingDto toCreatingDTO(Item item);
 
@@ -36,7 +33,5 @@ public interface ItemMapper {
 
     @Mapping(target = "authorName", source = "author.name")
     CommentDto toCommentDto(Comment comment);
-
-
 }
 
