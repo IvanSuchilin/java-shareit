@@ -2,6 +2,7 @@ package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,6 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class ItemRequestControllerTest {
+    private RequestResponseDto requestResponseDto;
+    private  List<RequestResponseDto> list;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -41,6 +44,13 @@ class ItemRequestControllerTest {
     private UserService userService;
     @MockBean
     private ItemRequestService itemRequestService;
+    @BeforeEach
+    void setUp() {
+        requestResponseDto = new RequestResponseDto(1L, "description",
+                LocalDateTime.now(), null);
+        list = new ArrayList<>();
+        list.add(requestResponseDto);
+    }
 
     @SneakyThrows
     @Test
@@ -62,10 +72,6 @@ class ItemRequestControllerTest {
     @SneakyThrows
     @Test
     void getUsersRequests() {
-        RequestResponseDto requestResponseDto = new RequestResponseDto(1L, "description",
-                LocalDateTime.now(), null);
-        List<RequestResponseDto> list = new ArrayList<>();
-        list.add(requestResponseDto);
         when(userService.getUserById(anyLong())).thenReturn(new UserDto());
         when(itemRequestService.getAllByUserId(anyLong()))
                 .thenReturn(list);
@@ -79,8 +85,7 @@ class ItemRequestControllerTest {
     @SneakyThrows
     @Test
     void getRequestById() {
-        RequestResponseDto requestResponseDto = new RequestResponseDto(1L, "description",
-                LocalDateTime.now(), null);
+
         when(userService.getUserById(anyLong())).thenReturn(new UserDto());
         when(itemRequestService.getRequestById(1L))
                 .thenReturn(requestResponseDto);
@@ -94,10 +99,6 @@ class ItemRequestControllerTest {
     @SneakyThrows
     @Test
     void getAllRequestsWithPagination() {
-        RequestResponseDto requestResponseDto = new RequestResponseDto(1L, "description",
-                LocalDateTime.now(), null);
-        List<RequestResponseDto> list = new ArrayList<>();
-        list.add(requestResponseDto);
         when(userService.getUserById(anyLong())).thenReturn(new UserDto());
         when(itemRequestService.getAllRequestsWithPagination(anyInt(), anyInt(), anyLong()))
                 .thenReturn(list);

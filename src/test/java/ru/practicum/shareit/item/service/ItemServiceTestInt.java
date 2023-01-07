@@ -54,7 +54,6 @@ class ItemServiceTestInt {
 
         itemRequestCreatingDto = new ItemRequestCreatingDto();
         user2 = new User(null, "name2", "email2test@mail.ru");
-       // wrongUser =  new User(null, "", "");
     }
 
     @Test
