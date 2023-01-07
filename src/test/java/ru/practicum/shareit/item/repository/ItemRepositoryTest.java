@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 @DataJpaTest
-
 class ItemRepositoryTest {
     @Autowired
     private TestEntityManager em;

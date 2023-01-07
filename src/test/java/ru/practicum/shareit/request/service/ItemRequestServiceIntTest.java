@@ -22,20 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class ItemRequestServiceTestInt {
+class ItemRequestServiceIntTest {
     private static ItemRequestCreatingDto itemRequestCreatingDto;
     private static User user1;
     @Autowired
     private UserService userService;
     @Autowired
     private ItemRequestService itemRequestService;
+
     @BeforeAll
     public static void setup() {
-       user1 = new User(null, "name1", "emailtest1@mail.ru");
+        user1 = new User(null, "name1", "emailtest1@mail.ru");
 
         itemRequestCreatingDto = new ItemRequestCreatingDto("text");
-        //user2 = new User(null, "name2", "email2test@mail.ru");
     }
+
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongUserTest() {
@@ -91,7 +92,7 @@ class ItemRequestServiceTestInt {
     void getAllRequestsWithPagination() {
         userService.create(user1);
         itemRequestService.create(1L, itemRequestCreatingDto);
-        List<RequestResponseDto> requests = itemRequestService.getAllRequestsWithPagination(0, 10,2L);
+        List<RequestResponseDto> requests = itemRequestService.getAllRequestsWithPagination(0, 10, 2L);
         assertEquals(1, requests.size());
         assertEquals("text", requests.get(0).getDescription());
     }

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
-class UserServiceTestInt {
+class UserServiceIntTest {
     private static User user1;
     private static User user2;
     private static User wrongUser;

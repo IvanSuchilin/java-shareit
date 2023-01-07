@@ -10,9 +10,7 @@ import java.util.List;
 
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
     List<ItemRequest> findAllByRequesterIdOrderByCreatedDesc(Long userId);
-    ItemRequest findFirstById(Long id);
+
     @Query(value = "select r from ItemRequest r where r.requester.id <> :userId order by r.created desc")
-    List<ItemRequest> findAllWithPagination(Pageable pageable ,@Param("userId") Long userId);
-    @Query(value = "select r from ItemRequest r where r.requester.id <> :userId order by r.created desc")
-    List<ItemRequest> findAllWitOutPagination(@Param("userId") Long userId);
+    List<ItemRequest> findAllWithPagination(Pageable pageable, @Param("userId") Long userId);
 }

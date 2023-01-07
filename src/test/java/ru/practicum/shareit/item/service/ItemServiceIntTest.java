@@ -31,7 +31,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class ItemServiceTestInt {
+class ItemServiceIntTest {
     private static User user1;
     private static User user2;
     private static ItemCreatingDto itemCreatingDto;
@@ -60,7 +60,7 @@ class ItemServiceTestInt {
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTest() {
         userService.create(user1);
-        itemRequestService.create(1L , itemRequestCreatingDto);
+        itemRequestService.create(1L, itemRequestCreatingDto);
         itemCreatingDto.setRequestId(1L);
         ItemCreatingDto stored = itemService.create(1L, itemCreatingDto);
 
@@ -102,7 +102,7 @@ class ItemServiceTestInt {
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
 
-        ItemDto stored = itemService.getItemById(1L,2L);
+        ItemDto stored = itemService.getItemById(1L, 2L);
 
         assertEquals(stored.getId(), 1L);
         assertEquals(stored.getName(), "itemName");
@@ -118,7 +118,7 @@ class ItemServiceTestInt {
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
 
-        ItemDto stored = itemService.getItemById(1L,1L);
+        ItemDto stored = itemService.getItemById(1L, 1L);
 
         assertEquals(stored.getId(), 1L);
         assertEquals(stored.getName(), "itemName");
@@ -133,7 +133,7 @@ class ItemServiceTestInt {
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
-                () -> itemService.getItemById(10L,1L));
+                () -> itemService.getItemById(10L, 1L));
         Assertions.assertEquals("Предмета c id10 нет", thrown.getReason());
     }
 
@@ -191,7 +191,7 @@ class ItemServiceTestInt {
         itemCreatingDto =
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
-        Collection<ItemDto> items = itemService.getAllUsersItems(1L,null);
+        Collection<ItemDto> items = itemService.getAllUsersItems(1L, null);
 
         assertEquals(1, items.size());
     }
@@ -275,10 +275,10 @@ class ItemServiceTestInt {
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
         bookingService.create(2L,
-                new BookingCreateDto(1L,LocalDateTime.now(),
+                new BookingCreateDto(1L, LocalDateTime.now(),
                         LocalDateTime.now().plusNanos(1L), user2));
         CommentDto commentDto = new CommentDto(null, "comment", user2.getName(),
-                LocalDateTime.of(2023,3,2,5,05,5));
+                LocalDateTime.of(2023, 3, 2, 5, 5, 5));
 
         CommentDto stored = itemService.createComment(2L, 1L, commentDto);
 

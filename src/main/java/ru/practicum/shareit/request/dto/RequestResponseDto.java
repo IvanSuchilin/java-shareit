@@ -15,7 +15,6 @@ import java.util.List;
 public class RequestResponseDto {
     private Long id;
     private String description;
-   // private User requester;
     private LocalDateTime created;
     List<ResponseItemDto> items;
 }
