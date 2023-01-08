@@ -31,12 +31,6 @@ public class BookingController {
     private final UserService userService;
     private final BookingService bookingService;
 
-    /*@Autowired
-    public BookingController(UserService userService, BookingService bookingService) {
-        this.userService = userService;
-        this.bookingService = bookingService;
-    }*/
-
     @PostMapping("/bookings")
     public BookingDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody BookingCreateDto bookingCreateDto) {
         log.info("Создание бронирования вещи id {}", bookingCreateDto.getItemId());
