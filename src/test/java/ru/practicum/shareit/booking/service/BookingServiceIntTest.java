@@ -377,7 +377,7 @@ class BookingServiceIntTest {
 
         ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
                 () -> bookingService.getAll(2L, "status", pageable));
-        Assertions.assertEquals("Неизвестный статус: UNSUPPORTED_STATUS", thrown.getMessage());
+        Assertions.assertEquals("Unknown state: UNSUPPORTED_STATUS", thrown.getMessage());
     }
 
     @Test
@@ -544,7 +544,7 @@ class BookingServiceIntTest {
 
         ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
                 () -> bookingService.getAllOwnersBooking(1L, "status", pageable));
-        Assertions.assertEquals("Неизвестный статус: UNSUPPORTED_STATUS", thrown.getMessage());
+        Assertions.assertEquals("Unknown state: UNSUPPORTED_STATUS", thrown.getMessage());
     }
 
     @Test

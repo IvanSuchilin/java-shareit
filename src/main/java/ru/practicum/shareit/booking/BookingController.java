@@ -17,8 +17,6 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
-
 /**
  * TODO Sprint add-bookings.
  */
@@ -30,6 +28,7 @@ import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADE
 public class BookingController {
     private final UserService userService;
     private final BookingService bookingService;
+    public static final String REQUEST_HEADER_SHARER = "X-Sharer-User-Id";
 
     @PostMapping("/bookings")
     public BookingDto create(@RequestHeader(REQUEST_HEADER_SHARER) Long userId, @RequestBody BookingCreateDto bookingCreateDto) {

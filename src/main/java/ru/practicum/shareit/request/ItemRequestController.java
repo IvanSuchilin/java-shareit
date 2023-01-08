@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestCreatingDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.RequestResponseDto;
@@ -17,8 +15,6 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
-
 /**
  * TODO Sprint add-item-requests.
  */
@@ -28,16 +24,13 @@ import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADE
 @RequestMapping
 public class ItemRequestController {
     private final UserService userService;
-    private final BookingService bookingService;
-    private final ItemService itemService;
     private final ItemRequestService itemRequestService;
+    public static final String REQUEST_HEADER_SHARER = "X-Sharer-User-Id";
 
     @Autowired
-    public ItemRequestController(UserService userService, BookingService bookingService, ItemService itemService,
+    public ItemRequestController(UserService userService,
                                  ItemRequestService itemRequestService) {
         this.userService = userService;
-        this.bookingService = bookingService;
-        this.itemService = itemService;
         this.itemRequestService = itemRequestService;
     }
 

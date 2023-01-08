@@ -15,8 +15,6 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
-import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADER_SHARER;
-
 /**
  * TODO Sprint add-controllers.
  */
@@ -26,6 +24,7 @@ import static ru.practicum.shareit.item.constants.RequestConstants.REQUEST_HEADE
 public class ItemController {
     private final ItemService itemService;
     private final UserService userService;
+    public static final String REQUEST_HEADER_SHARER = "X-Sharer-User-Id";
 
     @Autowired
     public ItemController(ItemService itemService, UserService userService) {
