@@ -31,7 +31,7 @@ class UserBookingDtoSerializationTest {
         JsonContent<UserBookingDto> json = jacksonTesterUserBookingDto.write(userBookingDto);
 
         assertThat(json).extractingJsonPathNumberValue("$.id").isEqualTo(1);
-        assertThat(json).extractingJsonPathStringValue("$.name").isEqualTo("name");
+        assertThat(json).extractingJsonPathStringValue("$.name").isEqualTo(userBookingDto.getName());
     }
 
     @SneakyThrows

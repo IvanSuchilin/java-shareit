@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.mappers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -17,6 +18,7 @@ class ItemMapperTest {
     private Item itemTest;
     private ItemCreatingDto itemCreatingDtoTest;
     private ItemDto itemDto;
+    private BookingItemDto lastBooking;
 
     @BeforeEach
     void setup() {
@@ -26,6 +28,8 @@ class ItemMapperTest {
         itemTest.setDescription("description");
         itemDto = new ItemDto();
         itemDto.setName("itemDtoName");
+        lastBooking = new BookingItemDto(1L, 2L);
+        itemDto.setLastBooking(lastBooking);
         itemCreatingDtoTest =
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
     }
@@ -56,6 +60,7 @@ class ItemMapperTest {
     @Test
     void updateItemTest() {
         ItemMapper.INSTANCE.updateItem(itemDto, itemTest);
+        Assertions.assertEquals("itemDtoName", itemTest.getName());
         Assertions.assertEquals("itemDtoName", itemTest.getName());
     }
 

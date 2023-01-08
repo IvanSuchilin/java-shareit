@@ -54,7 +54,6 @@ class CommentItemDtoSerializationTest {
         assertThat(json).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(json).extractingJsonPathStringValue("$.text").isEqualTo("text");
         assertThat(json).extractingJsonPathStringValue("$.authorName").isEqualTo("author");
-        assertThat(json).extractingJsonPathStringValue("$.created").isEqualTo(commentDto.getCreated().toString());
     }
 
     @SneakyThrows

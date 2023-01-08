@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
@@ -16,16 +19,17 @@ import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedExcepti
 import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
 import ru.practicum.shareit.exceptions.itemExceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
-import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemCreatingDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.dto.UserBookingDto;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -37,11 +41,10 @@ class BookingServiceIntTest {
     private static User user1;
     private static User user2;
     private static BookingCreateDto bookingCreateDto;
-    private static UserDto userDto;
-    private static ItemBookingDto itemBookingDto;
-    private static UserBookingDto userBookingDto;
-    private static LocalDateTime startBooking;
-    private static LocalDateTime endBooking;
+
+    Sort sort = Sort.by(Sort.Direction.DESC, "start");
+    final Pageable pageable = PageRequest.of(0, 10, sort);
+    private final EntityManager em;
     @Autowired
     private ItemService itemService;
     @Autowired
@@ -54,11 +57,8 @@ class BookingServiceIntTest {
     public static void setup() {
         user1 = new User(null, "name1", "emailtest1@mail.ru");
         user2 = new User(null, "name2", "email2test@mail.ru");
-        userDto = new UserDto(1L, "userName", "e@mail");
-        itemBookingDto = new ItemBookingDto(1L, "itemName");
-        userBookingDto = new UserBookingDto(1L, "name1");
-        startBooking = LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS);
-        endBooking = LocalDateTime.now().plusHours(10).truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime startBooking = LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime endBooking = LocalDateTime.now().plusHours(10).truncatedTo(ChronoUnit.SECONDS);
         bookingCreateDto = new BookingCreateDto(1L, startBooking, endBooking, user1);
     }
 
@@ -107,7 +107,7 @@ class BookingServiceIntTest {
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
-    void createTest(){
+    void createTest() {
         userService.create(user1);
         userService.create(user2);
         itemService.create(1L, new ItemCreatingDto(null, "itemName",
@@ -228,11 +228,332 @@ class BookingServiceIntTest {
         assertEquals(bookingCreateDto.getEnd(), stored.getEnd());
         assertEquals(Booking.BookingStatus.REJECTED, stored.getStatus());
     }
+
     @Test
-    void getAll() {
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithAll() {
+        userService.create(user1);
+        userService.create(user2);
+        itemService.create(1L, new ItemCreatingDto(null, "itemName",
+                "description", true, null));
+        bookingService.create(2L, bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.getAll(2L, "ALL", pageable);
+
+        assertEquals(bookings.size(), 1);
     }
 
     @Test
-    void getAllOwnersBooking() {
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithRejected() {
+        userService.create(user1);
+        userService.create(user2);
+        itemService.create(1L, new ItemCreatingDto(null, "itemName",
+                "description", true, null));
+        bookingService.create(2L, bookingCreateDto);
+        bookingService.updateApproving(1L, 1L, false);
+
+        List<BookingDto> bookings = bookingService.getAll(2L, "REJECTED", pageable);
+
+        assertEquals(bookings.size(), 1);
     }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithWaiting() {
+        userService.create(user1);
+        userService.create(user2);
+        itemService.create(1L, new ItemCreatingDto(null, "itemName",
+                "description", true, null));
+        bookingService.create(2L, bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.getAll(2L, "WAITING", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithCurrent() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().minusDays(1));
+        booking.setEnd(LocalDateTime.now().plusDays(2));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        List<BookingDto> bookings = bookingService.getAll(2L, "CURRENT", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithPast() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().minusDays(10));
+        booking.setEnd(LocalDateTime.now().minusDays(2));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        List<BookingDto> bookings = bookingService.getAll(2L, "PAST", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithFuture() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().plusDays(10));
+        booking.setEnd(LocalDateTime.now().plusDays(12));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        List<BookingDto> bookings = bookingService.getAll(2L, "FUTURE", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithUnsupported() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().plusDays(10));
+        booking.setEnd(LocalDateTime.now().plusDays(12));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
+                () -> bookingService.getAll(2L, "status", pageable));
+        Assertions.assertEquals("Неизвестный статус: UNSUPPORTED_STATUS", thrown.getMessage());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllWithWrongId() {
+        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAll(2L, "status", null));
+        Assertions.assertEquals("Пользователя c id2 нет", thrown.getReason());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithWrongId() {
+        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+                () -> bookingService.getAllOwnersBooking(2L, "status", null));
+        Assertions.assertEquals("Пользователя c id2 нет", thrown.getReason());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithAll() {
+        userService.create(user1);
+        userService.create(user2);
+        itemService.create(1L, new ItemCreatingDto(null, "itemName",
+                "description", true, null));
+        bookingService.create(2L, bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.getAllOwnersBooking(1L, "ALL", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithRejected() {
+        userService.create(user1);
+        userService.create(user2);
+        itemService.create(1L, new ItemCreatingDto(null, "itemName",
+                "description", true, null));
+        bookingService.create(2L, bookingCreateDto);
+        bookingService.updateApproving(1L, 1L, false);
+
+        List<BookingDto> bookings = bookingService.getAllOwnersBooking(1L, "REJECTED", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithWaiting() {
+        userService.create(user1);
+        userService.create(user2);
+        itemService.create(1L, new ItemCreatingDto(null, "itemName",
+                "description", true, null));
+        bookingService.create(2L, bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.getAllOwnersBooking(1L, "WAITING", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithCurrent() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().minusDays(1));
+        booking.setEnd(LocalDateTime.now().plusDays(2));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        List<BookingDto> bookings = bookingService.getAllOwnersBooking(1L, "CURRENT", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithPast() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().minusDays(10));
+        booking.setEnd(LocalDateTime.now().minusDays(2));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        List<BookingDto> bookings = bookingService.getAllOwnersBooking(1L, "PAST", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithFuture() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().plusDays(10));
+        booking.setEnd(LocalDateTime.now().plusDays(12));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        List<BookingDto> bookings = bookingService.getAllOwnersBooking(1L, "FUTURE", pageable);
+
+        assertEquals(bookings.size(), 1);
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithUnsupported() {
+        userService.create(user1);
+        userService.create(user2);
+
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().plusDays(10));
+        booking.setEnd(LocalDateTime.now().plusDays(12));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
+
+        ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
+                () -> bookingService.getAllOwnersBooking(1L, "status", pageable));
+        Assertions.assertEquals("Неизвестный статус: UNSUPPORTED_STATUS", thrown.getMessage());
+    }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void getAllOwnerWithoutBookings() {
+        userService.create(user1);
+        UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
+                () -> bookingService.getAllOwnersBooking(1L, "status", null));
+        Assertions.assertEquals("У пользователя нет вещей для аренды", thrown.getMessage());
+    }
+
 }

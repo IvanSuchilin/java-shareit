@@ -117,7 +117,7 @@ public class BookingService {
                 bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userStored, Booking.BookingStatus.REJECTED, pageable);
                 break;
             default:
-                throw new ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
+                throw new ValidationFailedException("Неизвестный статус: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
                 .map(BookingMapper.INSTANCE::toBookingDto)
@@ -154,7 +154,7 @@ public class BookingService {
                 bookings = bookingRepository.findAllByItemOwnerAndAndStatusOrderByStart(ownerStored, Booking.BookingStatus.REJECTED, pageable);
                 break;
             default:
-                throw new ValidationFailedException("Unknown state: UNSUPPORTED_STATUS");
+                throw new ValidationFailedException("Неизвестный статус: UNSUPPORTED_STATUS");
         }
         return bookings.stream()
                 .map(BookingMapper.INSTANCE::toBookingDto)
