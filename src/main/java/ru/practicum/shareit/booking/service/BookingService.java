@@ -91,7 +91,6 @@ public class BookingService {
     }
 
     public List<BookingDto> getAll(Long userId, String state, Pageable pageable) {
-        //Pageable pageable = PageRequest.of(from, size);
         List<Booking> bookings;
         now = LocalDateTime.now();
         User userStored = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,

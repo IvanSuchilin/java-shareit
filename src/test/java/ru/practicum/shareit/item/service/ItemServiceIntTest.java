@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @SpringBootTest
@@ -74,9 +74,9 @@ class ItemServiceIntTest {
     void createTestWithWrongUserTest() {
         itemCreatingDto =
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
-        UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class,
                 () -> itemService.create(1L, itemCreatingDto));
-        Assertions.assertEquals("Нет такого id", thrown.getMessage());
+        assertEquals("Нет такого id", thrown.getMessage());
     }
 
     @Test
@@ -86,10 +86,10 @@ class ItemServiceIntTest {
         itemCreatingDto =
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemCreatingDto.setRequestId(1L);
-        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
                 () -> itemService.create(1L, itemCreatingDto));
-        Assertions.assertEquals("Запроса c id1 нет", thrown.getReason());
-        Assertions.assertEquals(NOT_FOUND, thrown.getStatus());
+        assertEquals("Запроса c id1 нет", thrown.getReason());
+        assertEquals(NOT_FOUND, thrown.getStatus());
     }
 
 
@@ -132,9 +132,9 @@ class ItemServiceIntTest {
         itemCreatingDto =
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
-        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
                 () -> itemService.getItemById(10L, 1L));
-        Assertions.assertEquals("Предмета c id10 нет", thrown.getReason());
+        assertEquals("Предмета c id10 нет", thrown.getReason());
     }
 
     @Test
@@ -148,9 +148,9 @@ class ItemServiceIntTest {
         ItemDto itemDtoUpd = new ItemDto();
         itemDtoUpd.setName("updName");
 
-        UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class,
                 () -> itemService.update(1L, 2L, itemDtoUpd));
-        Assertions.assertEquals("Нет такого владельца вещи", thrown.getMessage());
+        assertEquals("Нет такого владельца вещи", thrown.getMessage());
     }
 
     @Test
@@ -164,9 +164,9 @@ class ItemServiceIntTest {
         ItemDto itemDtoUpd = new ItemDto();
         itemDtoUpd.setName("updName");
 
-        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
                 () -> itemService.update(10L, 2L, itemDtoUpd));
-        Assertions.assertEquals("Предмета c id10 нет", thrown.getReason());
+        assertEquals("Предмета c id10 нет", thrown.getReason());
     }
 
     @Test
@@ -231,9 +231,9 @@ class ItemServiceIntTest {
         itemService.create(1L, itemCreatingDto);
         CommentDto commentDto = new CommentDto(null, "", user2.getName(), LocalDateTime.now());
 
-        ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
+        ValidationFailedException thrown = assertThrows(ValidationFailedException.class,
                 () -> itemService.createComment(2L, 1L, commentDto));
-        Assertions.assertEquals("Комментарий не может быть пустым", thrown.getMessage());
+        assertEquals("Комментарий не может быть пустым", thrown.getMessage());
     }
 
     @Test
@@ -246,9 +246,9 @@ class ItemServiceIntTest {
         itemService.create(1L, itemCreatingDto);
         CommentDto commentDto = new CommentDto(null, "comment", user2.getName(), LocalDateTime.now());
 
-        ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
+        ResponseStatusException thrown = assertThrows(ResponseStatusException.class,
                 () -> itemService.createComment(2L, 10L, commentDto));
-        Assertions.assertEquals("Предмета c id10 нет", thrown.getReason());
+        assertEquals("Предмета c id10 нет", thrown.getReason());
     }
 
     @Test
@@ -261,9 +261,9 @@ class ItemServiceIntTest {
         itemService.create(1L, itemCreatingDto);
         CommentDto commentDto = new CommentDto(null, "comment", user2.getName(), LocalDateTime.now());
 
-        ValidationFailedException thrown = Assertions.assertThrows(ValidationFailedException.class,
+        ValidationFailedException thrown = assertThrows(ValidationFailedException.class,
                 () -> itemService.createComment(2L, 1L, commentDto));
-        Assertions.assertEquals("Бронирование пользователя не завершено или не существует", thrown.getMessage());
+        assertEquals("Бронирование пользователя не завершено или не существует", thrown.getMessage());
     }
 
     @Test

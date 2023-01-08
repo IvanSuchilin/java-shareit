@@ -33,8 +33,8 @@ class UserServiceIntTest {
 
     @BeforeAll
     public static void setup() {
-        user1 = new User(null, "name1", "emailtest1@mail.ru");
-        user2 = new User(null, "name2", "email2test@mail.ru");
+        user1 = new User(null, "name1", "emailtestuser1@mail.ru");
+        user2 = new User(null, "name2", "email2testuser@mail.ru");
         wrongUser =  new User(null, "", "");
     }
     @Test
@@ -44,14 +44,14 @@ class UserServiceIntTest {
 
         assertEquals(storedUserDto.getId(),1L);
         assertEquals(storedUserDto.getName(), "name1");
-        assertEquals(storedUserDto.getEmail(), "emailtest1@mail.ru");
+        assertEquals(storedUserDto.getEmail(), "emailtestuser1@mail.ru");
     }
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createUserEmailAlreadyExistTest() {
         userService.create(user1);
-        User newUser = new User(null, "name1", "emailtest1@mail.ru");
+        User newUser = new User(null, "name1", "emailtestuser1@mail.ru");
 
         EmailAlreadyExistException thrown = Assertions.assertThrows(EmailAlreadyExistException.class,
                 () -> userService.create(newUser));
@@ -105,7 +105,7 @@ class UserServiceIntTest {
     void updateEmailAlreadyExistTest() {
         userService.create(user1);
         userService.create(user2);
-        UserDto updatedUser = new UserDto(null,  null, "emailtest1@mail.ru");
+        UserDto updatedUser = new UserDto(null,  null, "emailtestuser1@mail.ru");
 
         EmailAlreadyExistException thrown = Assertions.assertThrows(EmailAlreadyExistException.class,
                 () -> userService.update(2L, updatedUser));
@@ -140,6 +140,7 @@ class UserServiceIntTest {
     }
 
     @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void deleteTest() {
         userService.create(user1);
         userService.create(user2);
@@ -151,6 +152,7 @@ class UserServiceIntTest {
     }
 
     @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllUsersTest() {
         userService.create(user1);
         userService.create(user2);
