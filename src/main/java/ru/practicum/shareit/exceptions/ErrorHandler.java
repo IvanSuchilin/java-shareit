@@ -33,7 +33,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({InvalidEmailException.class, InvalidItemDtoException.class, InvalidBookingDtoException.class,
-            ValidationFailedException.class, BadRequestException.class})
+            ValidationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateEmailException(final RuntimeException e) {
         log.debug("Возникла ошибка {},", e.getMessage());
