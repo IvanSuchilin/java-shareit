@@ -275,8 +275,8 @@ class ItemServiceIntTest {
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
         itemService.create(1L, itemCreatingDto);
         bookingService.create(2L,
-                new BookingCreateDto(1L, LocalDateTime.now(),
-                        LocalDateTime.now().plusNanos(1L), user2));
+                new BookingCreateDto(1L, LocalDateTime.now().plusNanos(10L),
+                        LocalDateTime.now().plusNanos(20L), user2));
         CommentDto commentDto = new CommentDto(null, "comment", user2.getName(),
                 LocalDateTime.of(2023, 3, 2, 5, 5, 5));
 
