@@ -8,18 +8,20 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.booking.dto.BookingCreateDto;
-import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestCreatingDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 class ItemServiceIntTest {
     private static User user1;
     private static User user2;
+    private final EntityManager em;
     private static ItemCreatingDto itemCreatingDto;
 
     private static ItemRequestCreatingDto itemRequestCreatingDto;
@@ -41,9 +44,6 @@ class ItemServiceIntTest {
     private ItemService itemService;
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private BookingService bookingService;
 
     @Autowired
     private ItemRequestService itemRequestService;
@@ -267,16 +267,24 @@ class ItemServiceIntTest {
     }
 
     @Test
+    @Transactional
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createCommentTest() {
         userService.create(user1);
         userService.create(user2);
-        itemCreatingDto =
-                new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
-        itemService.create(1L, itemCreatingDto);
-        bookingService.create(2L,
-                new BookingCreateDto(1L, LocalDateTime.now().plusNanos(10L),
-                        LocalDateTime.now().plusNanos(20L), user2));
+        Item item = new Item();
+        item.setName("itemName");
+        item.setDescription("itemDescription");
+        item.setAvailable(true);
+        item.setOwner(user1);
+        em.persist(item);
+        Booking booking = new Booking();
+        booking.setBooker(user2);
+        booking.setItem(item);
+        booking.setStart(LocalDateTime.now().minusDays(10));
+        booking.setEnd(LocalDateTime.now().minusDays(2));
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        em.persist(booking);
         CommentDto commentDto = new CommentDto(null, "comment", user2.getName(),
                 LocalDateTime.of(2023, 3, 2, 5, 5, 5));
 
