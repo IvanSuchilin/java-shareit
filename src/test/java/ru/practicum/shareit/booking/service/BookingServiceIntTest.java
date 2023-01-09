@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.exceptions.BookingExceptions.InvalidBookingDtoException;
 import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
 import ru.practicum.shareit.exceptions.itemExceptions.ItemNotFoundException;
@@ -70,6 +71,15 @@ class BookingServiceIntTest {
         Assertions.assertEquals("Пользователя c id10 нет", thrown.getReason());
         Assertions.assertEquals(NOT_FOUND, thrown.getStatus());
     }
+
+    @Test
+    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
+    void createWrongCreatingBookingDtoTest() {
+        InvalidBookingDtoException thrown = Assertions.assertThrows(InvalidBookingDtoException.class,
+                () -> bookingService.create(1L, new BookingCreateDto()));
+        Assertions.assertEquals("Отсутствуют необходимые данные для создания Booking", thrown.getMessage());
+    }
+
 
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})

@@ -15,6 +15,7 @@ import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.BookingExceptions.InvalidBookingDtoException;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.user.dto.UserBookingDto;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -81,6 +82,20 @@ class BookingControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.start").value(bookingCreateDtoCreate.getStart().toString()));
     }
 
+    @SneakyThrows
+    @Test
+    void createTestWrongBookingCreateDto() {
+        BookingCreateDto bookingCreateDtoWrongCreate = new BookingCreateDto();
+        when(userService.getUserById(1L)).thenReturn(userDto);
+        when(bookingService.create(anyLong(), any()))
+                .thenThrow(new InvalidBookingDtoException("Отсутствуют необходимые данные для создания Booking"));
+
+        mockMvc.perform(post("/bookings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1)
+                        .content(objectMapper.writeValueAsString(bookingCreateDtoWrongCreate)))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn().getResponse();
+    }
     @SneakyThrows
     @Test
     void getBookingByIdTest() {
