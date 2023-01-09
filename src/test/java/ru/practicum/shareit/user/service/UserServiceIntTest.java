@@ -22,27 +22,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-
 class UserServiceIntTest {
     private static User user1;
     private static User user2;
     private static User wrongUser;
 
     @Autowired
-    private  UserService userService;
+    private UserService userService;
 
     @BeforeAll
     public static void setup() {
         user1 = new User(null, "name1", "emailtestuser1@mail.ru");
         user2 = new User(null, "name2", "email2testuser@mail.ru");
-        wrongUser =  new User(null, "", "");
+        wrongUser = new User(null, "", "");
     }
+
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTest() {
         UserDto storedUserDto = userService.create(user1);
 
-        assertEquals(storedUserDto.getId(),1L);
+        assertEquals(storedUserDto.getId(), 1L);
         assertEquals(storedUserDto.getName(), "name1");
         assertEquals(storedUserDto.getEmail(), "emailtestuser1@mail.ru");
     }
@@ -97,7 +97,7 @@ class UserServiceIntTest {
 
         InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
                 () -> userService.update(1L, updatedUser));
-        Assertions.assertEquals("Адрес электронной должен содержать символ @",thrown.getMessage());
+        Assertions.assertEquals("Адрес электронной должен содержать символ @", thrown.getMessage());
     }
 
     @Test
@@ -105,7 +105,7 @@ class UserServiceIntTest {
     void updateEmailAlreadyExistTest() {
         userService.create(user1);
         userService.create(user2);
-        UserDto updatedUser = new UserDto(null,  null, "emailtestuser1@mail.ru");
+        UserDto updatedUser = new UserDto(null, null, "emailtestuser1@mail.ru");
 
         EmailAlreadyExistException thrown = Assertions.assertThrows(EmailAlreadyExistException.class,
                 () -> userService.update(2L, updatedUser));
@@ -115,7 +115,7 @@ class UserServiceIntTest {
     @Test
     @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateWrongUserTest() {
-        UserDto updatedUser = new UserDto(null,  null, "e@mail.ru");
+        UserDto updatedUser = new UserDto(null, null, "e@mail.ru");
 
         UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,
                 () -> userService.update(1L, updatedUser));

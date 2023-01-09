@@ -51,17 +51,17 @@ public class ItemRequestController {
     }
 
     @GetMapping("/requests/{requestId}")
-        public RequestResponseDto getRequestById(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                                 @PathVariable ("requestId") Long id){
-            log.info("Получение данных запроса  id {}", id);
-            userService.getUserById(userId);
-            return itemRequestService.getRequestById(id);
-        }
+    public RequestResponseDto getRequestById(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                                             @PathVariable("requestId") Long id) {
+        log.info("Получение данных запроса  id {}", id);
+        userService.getUserById(userId);
+        return itemRequestService.getRequestById(id);
+    }
 
     @GetMapping("/requests/all")
     public List<RequestResponseDto> getAllRequestsWithPagination(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                                   @PositiveOrZero @RequestParam (defaultValue = "0", required = false) int from,
-                                                   @Positive @RequestParam (defaultValue = "20", required = false) int size){
+                                                                 @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                                                 @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         log.info("Получение всех запросов  c пагинацией");
         userService.getUserById(userId);
         return itemRequestService.getAllRequestsWithPagination(from, size, userId);

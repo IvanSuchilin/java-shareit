@@ -53,12 +53,13 @@ public class ItemRequestService {
                         "Запроса c id" + id + " нет"));
         return ItemRequestMapper.INSTANCE.toRequestResponseDto(itemRequest);
     }
-    public List<RequestResponseDto> getAllRequestsWithPagination(int from,int size, Long userId) {
+
+    public List<RequestResponseDto> getAllRequestsWithPagination(int from, int size, Long userId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
-            Pageable pageable = PageRequest.of((from/size), size, sort);
-            List<ItemRequest> requests = itemRequestRepository.findAllWithPagination(pageable, userId);
-            return requests.stream()
-                    .map(ItemRequestMapper.INSTANCE::toRequestResponseDto)
-                    .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of((from / size), size, sort);
+        List<ItemRequest> requests = itemRequestRepository.findAllWithPagination(pageable, userId);
+        return requests.stream()
+                .map(ItemRequestMapper.INSTANCE::toRequestResponseDto)
+                .collect(Collectors.toList());
     }
 }

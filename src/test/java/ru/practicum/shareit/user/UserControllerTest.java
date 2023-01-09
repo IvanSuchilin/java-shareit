@@ -50,6 +50,7 @@ class UserControllerTest {
                 .andExpect(status().isOk());
         verify(userService).getUserById(1L);
     }
+
     @SneakyThrows
     @Test
     void createUserTest() {
@@ -64,6 +65,7 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"));
     }
+
     @SneakyThrows
     @Test
     void findAllUsersTest() {
@@ -82,6 +84,7 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].name", is(user2Dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].email", is(user2Dto.getEmail())));
     }
+
     @SneakyThrows
     @Test
     void updateUserTest() {
@@ -95,6 +98,7 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"));
     }
+
     @Test
     void deleteTest() throws Exception {
         mockMvc.perform(delete("/users/{userId}", userDto.getId())
@@ -102,7 +106,7 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(userService,times(1))
+        verify(userService, times(1))
                 .delete(userDto.getId());
     }
 }

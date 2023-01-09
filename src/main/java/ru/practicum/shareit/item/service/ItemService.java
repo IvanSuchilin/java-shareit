@@ -55,7 +55,7 @@ public class ItemService {
         User owner = userRepository.getReferenceById(userId);
         Item itemFromDto = ItemMapper.INSTANCE.toItem(itemDto);
         itemFromDto.setOwner(owner);
-        if(itemDto.getRequestId() != null) {
+        if (itemDto.getRequestId() != null) {
             ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND,
                             "Запроса c id" + itemDto.getRequestId() + " нет"));
@@ -83,8 +83,8 @@ public class ItemService {
         if (!itemRepository.findById(itemId).get().getOwner().getId().equals(userId)) {
             throw new UserNotFoundException("Нет такого владельца вещи");
         }
-            ItemMapper.INSTANCE.updateItem(itemDto, stored);
-            return ItemMapper.INSTANCE.toDTO(itemRepository.save(stored));
+        ItemMapper.INSTANCE.updateItem(itemDto, stored);
+        return ItemMapper.INSTANCE.toDTO(itemRepository.save(stored));
     }
 
     public Collection<ItemDto> getAllUsersItems(Long userId, Pageable pageable) {

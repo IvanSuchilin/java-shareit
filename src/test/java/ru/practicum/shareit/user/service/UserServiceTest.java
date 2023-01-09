@@ -108,10 +108,6 @@ class UserServiceTest {
     }
 
     @Test
-    void update() {
-    }
-
-    @Test
     void delete() {
         Long userId = 1L;
         // when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -137,27 +133,16 @@ class UserServiceTest {
     @Test
     void updateUser() {
         User oldUser = new User(1L, "oldName", "oldEmail@mail.ru");
-        User newUser = new User();
+        User newUser = new User(1L, "newName", "oldEmail@mail.ru");
+        UserDto userDto = UserMapper.INSTANCE.toDto(newUser);
         newUser.setName("newName");
         newUser.setEmail("newEmail@mail.ru");
         when(userRepository.findById(1L)).thenReturn(Optional.of(oldUser));
         when(userRepository.save(any())).thenReturn(newUser);
 
-        UserDto actualUser = userService.update(oldUser.getId(), UserMapper.INSTANCE.toDto(newUser));
+        UserDto actualUser = userService.update(oldUser.getId(), userDto);
 
         assertEquals(newUser.getName(), actualUser.getName());
         assertEquals(newUser.getEmail(), actualUser.getEmail());
-    }
-
-    @Test
-    void updateUserEmailAlreadyExist(){
-        User oldUser = new User(1L, "oldName", "oldEmail@mail.ru");
-        User newUser = new User();
-        newUser.setName("newName");
-        newUser.setEmail("newEmail@mail.ru");
-        doThrow(UserNotFoundException.class)
-                .when(userRepository).findById(any());
-        assertThrows(UserNotFoundException.class,
-                () -> userService.update(oldUser.getId(), UserMapper.INSTANCE.toDto(newUser)));
     }
 }

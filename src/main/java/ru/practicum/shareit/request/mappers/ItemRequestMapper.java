@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.mappers.UserMapper;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ItemRequestMapper {
     ItemRequestMapper INSTANCE = Mappers.getMapper(ItemRequestMapper.class);
+
     ItemRequestDto toItemRequestDto(ItemRequest itemRequest);
 
     RequestResponseDto toRequestResponseDto(ItemRequest itemRequest);

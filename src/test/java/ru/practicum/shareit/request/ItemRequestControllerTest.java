@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ItemRequestControllerTest {
     private RequestResponseDto requestResponseDto;
-    private  List<RequestResponseDto> list;
+    private List<RequestResponseDto> list;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -44,6 +44,7 @@ class ItemRequestControllerTest {
     private UserService userService;
     @MockBean
     private ItemRequestService itemRequestService;
+
     @BeforeEach
     void setUp() {
         requestResponseDto = new RequestResponseDto(1L, "description",
@@ -82,6 +83,7 @@ class ItemRequestControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(requestResponseDto.getDescription())));
     }
+
     @SneakyThrows
     @Test
     void getRequestById() {
@@ -96,6 +98,7 @@ class ItemRequestControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("description"));
     }
+
     @SneakyThrows
     @Test
     void getAllRequestsWithPagination() {
@@ -106,7 +109,7 @@ class ItemRequestControllerTest {
         mockMvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(requestResponseDto.getDescription())));
     }
 }

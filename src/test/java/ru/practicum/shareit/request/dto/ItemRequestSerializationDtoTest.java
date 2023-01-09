@@ -24,6 +24,7 @@ class ItemRequestSerializationDtoTest {
     private ItemRequestCreatingDto itemRequestCreatingDto;
     private ItemRequestDto itemRequestDto;
     private RequestResponseDto requestResponseDto;
+
     @BeforeEach
     void setUp() {
         itemRequestCreatingDto = new ItemRequestCreatingDto("description");
@@ -50,6 +51,7 @@ class ItemRequestSerializationDtoTest {
         assertThat(json).extractingJsonPathNumberValue("$.requester.id").isEqualTo(1);
         assertThat(json).extractingJsonPathStringValue("$.requester.name").isEqualTo("userName");
     }
+
     @SneakyThrows
     @Test
     void requestResponseDtoSerializationTest() {

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.exceptions.userExceptions.InvalidEmailException;
 import ru.practicum.shareit.user.dto.UserDto;
+
 @SpringBootTest
 class UserDtoValidatorTest {
     private UserDtoValidator userDtoValidator;
@@ -17,10 +18,10 @@ class UserDtoValidatorTest {
 
     @Test
     void validateUserDtoTest() {
-UserDto userDto = new UserDto(1L, "name", "mail");
+        UserDto userDto = new UserDto(1L, "name", "mail");
         InvalidEmailException thrown = Assertions.assertThrows(InvalidEmailException.class,
                 () -> userDtoValidator.validateUserDto(userDto));
-        Assertions.assertEquals("Адрес электронной должен содержать символ @" ,
+        Assertions.assertEquals("Адрес электронной должен содержать символ @",
                 thrown.getMessage());
     }
 }

@@ -85,6 +85,7 @@ class ItemControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("descriptionDto"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("nameDto"));
     }
+
     @SneakyThrows
     @Test
     void patchTest() {
@@ -92,14 +93,15 @@ class ItemControllerTest {
         when(itemService.getItemById(1L, 1L)).thenReturn(itemDto);
         when(itemService.update(anyLong(), anyLong(), any())).thenReturn(itemDto);
         mockMvc.perform(MockMvcRequestBuilders.patch("/items/{itemId}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .header("X-Sharer-User-Id", 1)
-                .content(objectMapper.writeValueAsString(itemDto)))
+                        .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("descriptionDto"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("nameDto"));
     }
+
     @SneakyThrows
     @Test
     void findAllUsersItems() {
@@ -109,12 +111,13 @@ class ItemControllerTest {
         when(itemService.getAllUsersItems(anyLong(), any())).thenReturn(items);
 
         mockMvc.perform(get("/items")
-                .header("X-Sharer-User-Id", 1))
+                        .header("X-Sharer-User-Id", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(itemDto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(itemDto.getDescription())));
     }
+
     @SneakyThrows
     @Test
     void searchItemTest() {

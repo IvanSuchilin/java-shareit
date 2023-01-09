@@ -57,28 +57,28 @@ public class ItemController {
 
     @GetMapping("/items")
     public Collection<ItemDto> findAllUsersItems(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                                 @PositiveOrZero @RequestParam (defaultValue = "0", required = false) int from,
-                                                 @Positive @RequestParam (defaultValue = "20", required = false) int size){
-    log.info("Получение всех вещей пользователя");
+                                                 @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                                 @Positive @RequestParam(defaultValue = "20", required = false) int size) {
+        log.info("Получение всех вещей пользователя");
         userService.getUserById(userId);
-        final Pageable pageable = PageRequest.of((from/size), size);
+        final Pageable pageable = PageRequest.of((from / size), size);
         return itemService.getAllUsersItems(userId, pageable);
     }
 
     @GetMapping("/items/search")
     public Collection<ItemDto> searchItem(@RequestParam String text,
-                                          @PositiveOrZero @RequestParam (defaultValue = "0", required = false) int from,
-                                          @Positive @RequestParam (defaultValue = "20", required = false) int size) {
+                                          @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                          @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
-        final Pageable pageable = PageRequest.of((from/size), size);
+        final Pageable pageable = PageRequest.of((from / size), size);
         return itemService.searchItem(text, pageable);
     }
 
     @PostMapping("/items/{itemId}/comment")
     public CommentDto createComment(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-            @PathVariable("itemId") Long itemId, @RequestBody CommentDto commentDto) {
-            log.info("Создание комментария к вещи id {} пользователем {}", itemId, userId);
-            userService.getUserById(userId);
-            return itemService.createComment(userId, itemId, commentDto);
+                                    @PathVariable("itemId") Long itemId, @RequestBody CommentDto commentDto) {
+        log.info("Создание комментария к вещи id {} пользователем {}", itemId, userId);
+        userService.getUserById(userId);
+        return itemService.createComment(userId, itemId, commentDto);
     }
 }

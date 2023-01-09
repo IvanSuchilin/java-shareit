@@ -7,15 +7,15 @@ import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ItemRequestMapperTest {
     private Item item;
+
     @BeforeEach
     void setup() {
         User user = new User(null, "name1", "emailtest1@mail.ru");
         item = new Item(1L, "itemName", "description", true, user, null, null);
     }
+
     @Test
     void toResponseItemDTO() {
         ResponseItemDto responseItemDto = ItemRequestMapper.INSTANCE.toResponseItemDTO(item);

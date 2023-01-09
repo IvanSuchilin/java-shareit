@@ -55,22 +55,22 @@ public class BookingController {
     @GetMapping("/bookings")
     public List<BookingDto> getAll(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                                    @RequestParam(required = false) String state,
-                                   @RequestParam (defaultValue = "0", required = false) @Min(0) int from,
-                                   @RequestParam (defaultValue = "20", required = false) @Min(1)int size) {
+                                   @RequestParam(defaultValue = "0", required = false) @Min(0) int from,
+                                   @RequestParam(defaultValue = "20", required = false) @Min(1) int size) {
         userService.getUserById(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
-        final Pageable pageable = PageRequest.of((from/size), size,sort);
+        final Pageable pageable = PageRequest.of((from / size), size, sort);
         return bookingService.getAll(userId, state, pageable);
     }
 
     @GetMapping("/bookings/owner")
     public List<BookingDto> getAllToOwner(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                                           @RequestParam(required = false) String state,
-                                          @PositiveOrZero@RequestParam (defaultValue = "0", required = false) int from,
-                                          @Positive @RequestParam (defaultValue = "20", required = false) int size) {
+                                          @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                          @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         userService.getUserById(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
-        final Pageable pageable = PageRequest.of((from/size), size,sort);
+        final Pageable pageable = PageRequest.of((from / size), size, sort);
         return bookingService.getAllOwnersBooking(userId, state, pageable);
     }
 }

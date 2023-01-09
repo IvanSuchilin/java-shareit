@@ -96,6 +96,7 @@ class BookingControllerTest {
                         .content(objectMapper.writeValueAsString(bookingCreateDtoWrongCreate)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn().getResponse();
     }
+
     @SneakyThrows
     @Test
     void getBookingByIdTest() {
@@ -154,6 +155,7 @@ class BookingControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status", is(bookingDtoAll.getStatus().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].end", is(bookingDtoAll.getEnd().toString())));
     }
+
     @SneakyThrows
     @Test
     void getAllToOwnerTest() {
