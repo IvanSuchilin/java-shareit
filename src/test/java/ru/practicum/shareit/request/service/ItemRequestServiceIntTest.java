@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(scripts = {"file:src/test/java/resources/scripts/schemaTest.sql"})
 class ItemRequestServiceIntTest {
     private static ItemRequestCreatingDto itemRequestCreatingDto;
     private static User user1;
@@ -38,7 +39,6 @@ class ItemRequestServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongUserTest() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> itemRequestService.create(1L, itemRequestCreatingDto));
@@ -46,7 +46,6 @@ class ItemRequestServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTest() {
         userService.create(user1);
         ItemRequestDto stored = itemRequestService.create(1L, itemRequestCreatingDto);
@@ -58,7 +57,6 @@ class ItemRequestServiceIntTest {
 
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllByUserId() {
         userService.create(user1);
         itemRequestService.create(1L, itemRequestCreatingDto);
@@ -69,7 +67,6 @@ class ItemRequestServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getRequestByWrongId() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> itemRequestService.getRequestById(1L));
@@ -77,7 +74,6 @@ class ItemRequestServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getRequestById() {
         userService.create(user1);
         itemRequestService.create(1L, itemRequestCreatingDto);
@@ -88,7 +84,6 @@ class ItemRequestServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllRequestsWithPagination() {
         userService.create(user1);
         itemRequestService.create(1L, itemRequestCreatingDto);

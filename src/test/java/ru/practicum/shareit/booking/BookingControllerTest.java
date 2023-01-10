@@ -39,10 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookingControllerTest {
     private User booker;
     private UserDto userDto;
-    ItemBookingDto itemBookingDto;
-    UserBookingDto userBookingDto;
-    LocalDateTime startBooking;
-    LocalDateTime endBooking;
+    private ItemBookingDto itemBookingDto;
+    private UserBookingDto userBookingDto;
+    private LocalDateTime startBooking;
+    private LocalDateTime endBooking;
     @Autowired
     MockMvc mockMvc;
     @Autowired

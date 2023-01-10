@@ -38,13 +38,14 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(scripts = {"file:src/test/java/resources/scripts/schemaTest.sql"})
 class BookingServiceIntTest {
     private static User user1;
     private static User user2;
     private static BookingCreateDto bookingCreateDto;
 
-    Sort sort = Sort.by(Sort.Direction.DESC, "start");
-    final Pageable pageable = PageRequest.of(0, 10, sort);
+    private Sort sort = Sort.by(Sort.Direction.DESC, "start");
+    private final Pageable pageable = PageRequest.of(0, 10, sort);
     private final EntityManager em;
     @Autowired
     private ItemService itemService;
@@ -64,7 +65,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongUserTest() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> bookingService.create(10L, bookingCreateDto));
@@ -73,7 +73,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongCreatingBookingDtoTest() {
         InvalidBookingDtoException thrown = Assertions.assertThrows(InvalidBookingDtoException.class,
                 () -> bookingService.create(1L, new BookingCreateDto()));
@@ -82,7 +81,6 @@ class BookingServiceIntTest {
 
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongItemTest() {
         userService.create(user1);
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
@@ -92,7 +90,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createNotAvailableItemTest() {
         userService.create(user1);
         itemService.create(1L, new ItemCreatingDto(null, "itemName",
@@ -104,7 +101,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createNotAvailableItemForOwnerTest() {
         userService.create(user1);
         itemService.create(1L, new ItemCreatingDto(null, "itemName",
@@ -116,7 +112,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTest() {
         userService.create(user1);
         userService.create(user2);
@@ -131,7 +126,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getBookingByWrongIdTest() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> bookingService.getBookingById(1L, 1L));
@@ -140,7 +134,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getBookingByWrongIdUserTest() {
         userService.create(user1);
         userService.create(user2);
@@ -153,7 +146,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getBookingByIdTest() {
         userService.create(user1);
         userService.create(user2);
@@ -169,7 +161,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateApprovingWrongIdTest() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> bookingService.updateApproving(1L, 1L, true));
@@ -178,7 +169,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateApprovingByWrongIdUserTest() {
         userService.create(user1);
         userService.create(user2);
@@ -191,7 +181,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateApprovingTest() {
         userService.create(user1);
         userService.create(user2);
@@ -208,7 +197,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateApprovingAgainTest() {
         userService.create(user1);
         userService.create(user2);
@@ -223,7 +211,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateApprovingRejectedTest() {
         userService.create(user1);
         userService.create(user2);
@@ -240,7 +227,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithAll() {
         userService.create(user1);
         userService.create(user2);
@@ -254,7 +240,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithRejected() {
         userService.create(user1);
         userService.create(user2);
@@ -269,7 +254,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithWaiting() {
         userService.create(user1);
         userService.create(user2);
@@ -284,7 +268,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithCurrent() {
         userService.create(user1);
         userService.create(user2);
@@ -311,7 +294,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithPast() {
         userService.create(user1);
         userService.create(user2);
@@ -338,7 +320,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithFuture() {
         userService.create(user1);
         userService.create(user2);
@@ -365,7 +346,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithUnsupported() {
         userService.create(user1);
         userService.create(user2);
@@ -391,7 +371,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllWithWrongId() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> bookingService.getAll(2L, "status", null));
@@ -399,7 +378,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithWrongId() {
         ResponseStatusException thrown = Assertions.assertThrows(ResponseStatusException.class,
                 () -> bookingService.getAllOwnersBooking(2L, "status", null));
@@ -407,7 +385,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithAll() {
         userService.create(user1);
         userService.create(user2);
@@ -421,7 +398,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithRejected() {
         userService.create(user1);
         userService.create(user2);
@@ -436,7 +412,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithWaiting() {
         userService.create(user1);
         userService.create(user2);
@@ -451,7 +426,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithCurrent() {
         userService.create(user1);
         userService.create(user2);
@@ -478,7 +452,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithPast() {
         userService.create(user1);
         userService.create(user2);
@@ -505,7 +478,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithFuture() {
         userService.create(user1);
         userService.create(user2);
@@ -532,7 +504,6 @@ class BookingServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithUnsupported() {
         userService.create(user1);
         userService.create(user2);
@@ -558,7 +529,6 @@ class BookingServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllOwnerWithoutBookings() {
         userService.create(user1);
         UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class,

@@ -31,6 +31,6 @@ public class ItemRequest implements Serializable {
     private User requester;
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
-   @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "itemRequest")
+   @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "itemRequest")
    private List<Item> items;
 }

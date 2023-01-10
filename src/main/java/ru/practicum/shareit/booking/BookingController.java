@@ -58,9 +58,7 @@ public class BookingController {
                                    @RequestParam(defaultValue = "0", required = false) @Min(0) int from,
                                    @RequestParam(defaultValue = "20", required = false) @Min(1) int size) {
         userService.getUserById(userId);
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-        final Pageable pageable = PageRequest.of((from / size), size, sort);
-        return bookingService.getAll(userId, state, pageable);
+        return bookingService.getAll(userId, state, createPageable(from, size));
     }
 
     @GetMapping("/bookings/owner")
@@ -69,8 +67,11 @@ public class BookingController {
                                           @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
                                           @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         userService.getUserById(userId);
+        return bookingService.getAllOwnersBooking(userId, state, createPageable(from, size));
+    }
+
+    private Pageable createPageable(int from, int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
-        final Pageable pageable = PageRequest.of((from / size), size, sort);
-        return bookingService.getAllOwnersBooking(userId, state, pageable);
+        return PageRequest.of((from / size), size, sort);
     }
 }

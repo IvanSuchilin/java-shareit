@@ -33,6 +33,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(scripts = {"file:src/test/java/resources/scripts/schemaTest.sql"})
 class ItemServiceIntTest {
     private static User user1;
     private static User user2;
@@ -57,7 +58,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTest() {
         userService.create(user1);
         itemRequestService.create(1L, itemRequestCreatingDto);
@@ -70,7 +70,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTestWithWrongUserTest() {
         itemCreatingDto =
                 new ItemCreatingDto(null, "itemName", "itemDescription", true, null);
@@ -80,7 +79,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createTestWithWrongRequestTest() {
         userService.create(user1);
         itemCreatingDto =
@@ -94,7 +92,6 @@ class ItemServiceIntTest {
 
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getItemByIdTest() {
         userService.create(user1);
         userService.create(user2);
@@ -110,7 +107,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getItemByIdTestItemWithBookingTest() {
         userService.create(user1);
         userService.create(user2);
@@ -126,7 +122,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getItemByIdTestWrongIdTest() {
         userService.create(user1);
         itemCreatingDto =
@@ -138,7 +133,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateWrongOwnerTest() {
         userService.create(user1);
         userService.create(user2);
@@ -154,7 +148,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateWrongIdTest() {
         userService.create(user1);
         userService.create(user2);
@@ -170,7 +163,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void updateTest() {
         userService.create(user1);
         itemCreatingDto =
@@ -185,7 +177,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void getAllUsersItemsTests() {
         userService.create(user1);
         itemCreatingDto =
@@ -197,7 +188,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void searchItemTest() {
         userService.create(user1);
         itemCreatingDto =
@@ -210,7 +200,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void searchItemEmptyTextTest() {
         userService.create(user1);
         itemCreatingDto =
@@ -222,7 +211,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createEmptyCommentTest() {
         userService.create(user1);
         userService.create(user2);
@@ -237,7 +225,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongItemIdCommentTest() {
         userService.create(user1);
         userService.create(user2);
@@ -252,7 +239,6 @@ class ItemServiceIntTest {
     }
 
     @Test
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createWrongBookingTimeCommentTest() {
         userService.create(user1);
         userService.create(user2);
@@ -268,7 +254,6 @@ class ItemServiceIntTest {
 
     @Test
     @Transactional
-    @Sql(scripts = {"file:dbTest/scripts/schemaTest.sql"})
     void createCommentTest() {
         userService.create(user1);
         userService.create(user2);

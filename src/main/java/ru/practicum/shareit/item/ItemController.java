@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCreatingDto;
@@ -61,8 +60,7 @@ public class ItemController {
                                                  @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         log.info("Получение всех вещей пользователя");
         userService.getUserById(userId);
-        final Pageable pageable = PageRequest.of((from / size), size);
-        return itemService.getAllUsersItems(userId, pageable);
+        return itemService.getAllUsersItems(userId, PageRequest.of((from / size), size));
     }
 
     @GetMapping("/items/search")
@@ -70,8 +68,7 @@ public class ItemController {
                                           @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
                                           @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
-        final Pageable pageable = PageRequest.of((from / size), size);
-        return itemService.searchItem(text, pageable);
+        return itemService.searchItem(text, PageRequest.of((from / size), size));
     }
 
     @PostMapping("/items/{itemId}/comment")
