@@ -1,10 +1,9 @@
 package ru.practicum.shareit.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mappers.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -15,14 +14,15 @@ import java.util.Collection;
  */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping
 public class UserController {
     private final UserService userService;
 
-    @Autowired
+   /* @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-    }
+    }*/
 
     @GetMapping("/users/{userId}")
     public UserDto get(@PathVariable("userId") Long id) {
@@ -33,7 +33,7 @@ public class UserController {
     @PostMapping("/users")
     public UserDto create(@RequestBody User user) {
         log.info("Создание пользователя {}", user.getName());
-        return UserMapper.INSTANCE.toDto(userService.create(user));
+        return userService.create(user);
     }
 
     @PatchMapping("/users/{userId}")

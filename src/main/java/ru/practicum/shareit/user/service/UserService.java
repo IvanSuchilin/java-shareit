@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class    UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final UserDtoValidator userDtoValidator;
 
-    public User create(User user) {
+    public UserDto create(User user) {
         userValidator.validateUser(user);
         log.debug("Получен запрос на создание пользователя {}", user.getName());
         User saveUser;
@@ -34,7 +34,7 @@ public class UserService {
         } catch (Throwable e) {
             throw new EmailAlreadyExistException("Пользователь с такой почтой уже существует");
         }
-        return saveUser;
+        return UserMapper.INSTANCE.toDto(saveUser);
     }
 
     public UserDto getUserById(Long id) {
@@ -44,7 +44,7 @@ public class UserService {
                 .noneMatch(u -> Objects.equals(u.getId(), id))) {
             throw new UserNotFoundException("Нет такого id");
         }
-        return UserMapper.INSTANCE.toDto(userRepository.getReferenceById(id));
+        return UserMapper.INSTANCE.toDto(userRepository.findById(id).get());
     }
 
     public UserDto update(Long id, UserDto userDto) {
@@ -61,7 +61,8 @@ public class UserService {
             User stored = userRepository.findById(id)
                     .orElseThrow(ChangeSetPersister.NotFoundException::new);
             UserMapper.INSTANCE.updateUser(userDto, stored);
-            return UserMapper.INSTANCE.toDto(userRepository.save(stored));
+            User actualUser = userRepository.save(stored);
+            return UserMapper.INSTANCE.toDto(actualUser);
         } catch (ChangeSetPersister.NotFoundException e) {
             throw new UserNotFoundException("Нет такого пользователя");
         }

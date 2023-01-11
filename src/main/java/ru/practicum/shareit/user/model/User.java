@@ -3,8 +3,6 @@ package ru.practicum.shareit.user.model;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -12,10 +10,8 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Table(schema = "public", name = "users")
 public class User implements Serializable {
@@ -26,7 +22,5 @@ public class User implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "email", nullable = false, unique = true)
-    @Email(message = "Email должен быть корректным адресом электронной почты.")
-    @NotNull(message = "Email не должен быть NULL.")
     private String email;
 }

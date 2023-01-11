@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,35 +13,40 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mappers.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.validator.ItemDtoValidator;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemService {
     private final ItemDtoValidator itemDtoValidator;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     private final CommentRepository commentRepository;
 
-    public ItemDto create(Long userId, ItemDto itemDto) {
+    public ItemCreatingDto create(Long userId, ItemCreatingDto itemDto) {
         itemDtoValidator.validateItemDto(itemDto);
         log.debug("Получен на создание вещи {}", itemDto.getName());
         if (userRepository.findAll()
@@ -52,15 +57,17 @@ public class ItemService {
         User owner = userRepository.getReferenceById(userId);
         Item itemFromDto = ItemMapper.INSTANCE.toItem(itemDto);
         itemFromDto.setOwner(owner);
-        return ItemMapper.INSTANCE.toDTO(itemRepository.save(itemFromDto));
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Запроса c id" + itemDto.getRequestId() + " нет"));
+            itemFromDto.setItemRequest(itemRequest);
+        }
+        return ItemMapper.INSTANCE.toCreatingDTO(itemRepository.save(itemFromDto));
     }
 
     public ItemDto getItemById(Long id, Long userId) {
         log.debug("Получен запрос GET /items/{itemId}");
-        List<Item> allItems = itemRepository.findAll();
-        if (allItems.stream().noneMatch(i -> Objects.equals(i.getId(), id))) {
-            throw new UserNotFoundException("Нет такого id");
-        }
         Item itemWithoutBooking = itemRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Предмета c id" + id + " нет"));
@@ -72,34 +79,31 @@ public class ItemService {
     }
 
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
-        if (!itemRepository.getReferenceById(itemId).getOwner().getId().equals(userId)) {
+        Item stored = itemRepository.findById(itemId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Предмета c id" + itemId + " нет"));
+        if (!itemRepository.findById(itemId).get().getOwner().getId().equals(userId)) {
             throw new UserNotFoundException("Нет такого владельца вещи");
         }
-        try {
-            Item stored = itemRepository.findById(itemId)
-                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
-            ItemMapper.INSTANCE.updateItem(itemDto, stored);
-            return ItemMapper.INSTANCE.toDTO(itemRepository.save(stored));
-        } catch (ChangeSetPersister.NotFoundException e) {
-            throw new UserNotFoundException("Нет такой вещи");
-        }
+        ItemMapper.INSTANCE.updateItem(itemDto, stored);
+        return ItemMapper.INSTANCE.toDTO(itemRepository.save(stored));
     }
 
-    public Collection<ItemDto> getAllUsersItems(Long userId) {
+    public Collection<ItemDto> getAllUsersItems(Long userId, Pageable pageable) {
         log.debug("Получен запрос GET /items");
-        return itemRepository.findItemByOwnerId(userId)
+        return itemRepository.findItemByOwnerId(userId, pageable)
                 .stream()
                 .map(this::createItemDtoWithBooking)
                 .collect(Collectors.toList());
     }
 
-    public Collection<ItemDto> searchItem(String text) {
+    public Collection<ItemDto> searchItem(String text, Pageable pageable) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
         String lowText = text.toLowerCase();
-        return itemRepository.findByText(lowText)
+        return itemRepository.findByText(lowText, pageable)
                 .stream()
                 .map(ItemMapper.INSTANCE::toDTO)
                 .collect(Collectors.toList());
@@ -110,8 +114,7 @@ public class ItemService {
         if (commentDto.getText().isEmpty()) {
             throw new ValidationFailedException("Комментарий не может быть пустым");
         }
-        User author = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Пользователя c id" + userId + " нет"));
+        User author = userRepository.findById(userId).get();
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Предмета c id" + itemId + " нет"));
         if (!bookingRepository.existsByItemAndAndBookerAndEndBefore(item, author, LocalDateTime.now())) {

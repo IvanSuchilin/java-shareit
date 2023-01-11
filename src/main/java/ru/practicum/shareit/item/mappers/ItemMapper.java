@@ -6,6 +6,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -18,7 +19,10 @@ public interface ItemMapper {
 
     ItemDto toDTO(Item item);
 
-    Item toItem(ItemDto itemDto);
+    Item toItem(ItemCreatingDto itemDto);
+
+    @Mapping(target = "requestId", source = "itemRequest.id")
+    ItemCreatingDto toCreatingDTO(Item item);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", ignore = true)
