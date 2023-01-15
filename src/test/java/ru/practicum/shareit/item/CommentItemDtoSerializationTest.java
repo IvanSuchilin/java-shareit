@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;

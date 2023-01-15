@@ -20,7 +20,7 @@ import ru.practicum.shareit.exceptions.BookingExceptions.ValidationFailedExcepti
 import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
 import ru.practicum.shareit.exceptions.itemExceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.userExceptions.UserNotFoundException;
-import ru.practicum.shareit.item.dto.ItemCreatingDto;
+import ru.practicum.shareit.item.ItemCreatingDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;

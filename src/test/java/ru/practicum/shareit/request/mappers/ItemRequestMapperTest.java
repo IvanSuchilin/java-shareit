@@ -3,7 +3,7 @@ package ru.practicum.shareit.request.mappers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.item.dto.ResponseItemDto;
+import ru.practicum.shareit.item.ResponseItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 

@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.itemExceptions.InvalidItemDtoException;
-import ru.practicum.shareit.item.dto.ItemCreatingDto;
+import ru.practicum.shareit.item.ItemCreatingDto;
 
 @Slf4j
 @Component

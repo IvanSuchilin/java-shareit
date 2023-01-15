@@ -19,11 +19,6 @@ import java.util.Collection;
 public class UserController {
     private final UserService userService;
 
-   /* @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }*/
-
     @GetMapping("/users/{userId}")
     public UserDto get(@PathVariable("userId") Long id) {
         log.info("Получение пользователя id {}", id);
