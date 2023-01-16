@@ -12,9 +12,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -55,8 +52,8 @@ public class BookingController {
     @GetMapping("/bookings")
     public List<BookingDto> getAll(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                                    @RequestParam(required = false) String state,
-                                   @RequestParam(defaultValue = "0", required = false) @Min(0) int from,
-                                   @RequestParam(defaultValue = "20", required = false) @Min(1) int size) {
+                                   @RequestParam(defaultValue = "0", required = false) int from,
+                                   @RequestParam(defaultValue = "20", required = false) int size) {
         userService.getUserById(userId);
         return bookingService.getAll(userId, state, createPageable(from, size));
     }
@@ -64,8 +61,8 @@ public class BookingController {
     @GetMapping("/bookings/owner")
     public List<BookingDto> getAllToOwner(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                                           @RequestParam(required = false) String state,
-                                          @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
-                                          @Positive @RequestParam(defaultValue = "20", required = false) int size) {
+                                          @RequestParam(defaultValue = "0", required = false) int from,
+                                          @RequestParam(defaultValue = "20", required = false) int size) {
         userService.getUserById(userId);
         return bookingService.getAllOwnersBooking(userId, state, createPageable(from, size));
     }

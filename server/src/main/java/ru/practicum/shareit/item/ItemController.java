@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
@@ -53,8 +51,8 @@ public class ItemController {
 
     @GetMapping("/items")
     public Collection<ItemDto> findAllUsersItems(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                                 @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
-                                                 @Positive @RequestParam(defaultValue = "20", required = false) int size) {
+                                                 @RequestParam(defaultValue = "0", required = false) int from,
+                                                 @RequestParam(defaultValue = "20", required = false) int size) {
         log.info("Получение всех вещей пользователя");
         userService.getUserById(userId);
         return itemService.getAllUsersItems(userId, PageRequest.of((from / size), size));
@@ -62,8 +60,8 @@ public class ItemController {
 
     @GetMapping("/items/search")
     public Collection<ItemDto> searchItem(@RequestParam String text,
-                                          @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
-                                          @Positive @RequestParam(defaultValue = "20", required = false) int size) {
+                                          @RequestParam(defaultValue = "0", required = false) int from,
+                                          @RequestParam(defaultValue = "20", required = false) int size) {
         log.debug("Получен запрос GET /items/search. Найти вещь по запросу {} ", text);
         return itemService.searchItem(text, PageRequest.of((from / size), size));
     }
