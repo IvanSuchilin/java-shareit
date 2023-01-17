@@ -39,7 +39,7 @@ public class ItemController {
     public ResponseEntity<Object> patch(@PathVariable("itemId") Long id, @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                                         @RequestBody ItemDto itemDto) {
         log.info("Обновление данных вещи {} в getway", id);
-        return itemClient.updateItem(id, userId, itemDto);
+        return itemClient.updateItem(userId, id, itemDto);
     }
 
     @GetMapping("/items")

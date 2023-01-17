@@ -21,6 +21,7 @@ import javax.validation.constraints.PositiveOrZero;
 public class BookingController {
     private final BookingClient bookingClient;
     public static final String REQUEST_HEADER_SHARER = "X-Sharer-User-Id";
+
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader(REQUEST_HEADER_SHARER) long userId,
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
@@ -28,7 +29,7 @@ public class BookingController {
                                               @Positive @RequestParam(name = "size", defaultValue = "20") Integer size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-        log.info("ПОлучение всех бронирований со статусом {}, userId={}, from={}, size={} в gateway", stateParam, userId, from, size);
+        log.info("Получение всех бронирований со статусом {}, userId={}, from={}, size={} в gateway", stateParam, userId, from, size);
         return bookingClient.getAllBookings(userId, state, from, size);
     }
 
@@ -36,9 +37,6 @@ public class BookingController {
     public ResponseEntity<Object> createItem(@RequestHeader(REQUEST_HEADER_SHARER) long userId,
                                              @RequestBody @Valid BookItemRequestDto requestDto) {
         log.info("Создание бронирования {}, userId={} в gateway", requestDto, userId);
-        if (!requestDto.getStart().isBefore(requestDto.getEnd())) {
-            throw new IllegalArgumentException("Дата старта не может быть в прошлом или равна дате окончания");
-        }
         return bookingClient.bookItem(userId, requestDto);
     }
 
@@ -62,8 +60,8 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public ResponseEntity<Object> update(@PathVariable("bookingId") Long bookingId,
-                             @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                             @RequestParam Boolean approved) {
+                                         @RequestHeader(REQUEST_HEADER_SHARER) Long userId,
+                                         @RequestParam Boolean approved) {
         log.info("Подтверждение/отклонение бронирования вещи {} в gateway", bookingId);
         return bookingClient.updateApprovingBooking(bookingId, userId, approved);
     }

@@ -37,15 +37,15 @@ public class RequestController {
 
     @GetMapping("/requests/{requestId}")
     public ResponseEntity<Object> getRequestById(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                             @PathVariable("requestId") Long id) {
+                                                 @PathVariable("requestId") Long id) {
         log.info("Получение данных запроса  id {}", id);
         return requestClient.getRequestById(userId, id);
     }
 
     @GetMapping("/requests/all")
     public ResponseEntity<Object> getAllRequestsWithPagination(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
-                                                                 @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
-                                                                 @Positive @RequestParam(defaultValue = "20", required = false) int size) {
+                                                               @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                                               @Positive @RequestParam(defaultValue = "20", required = false) int size) {
         log.info("Получение всех запросов  c пагинацией");
         return requestClient.getAll(userId, from, size);
     }

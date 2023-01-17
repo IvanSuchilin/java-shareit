@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.dto.ItemCreatingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Map;
+
 @Service
 public class ItemClient extends BaseClient {
     private static final String API_PREFIX = "/items";
@@ -27,16 +28,16 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> createItem(Long userId, ItemCreatingDto itemCreatingDto){
-        return post("",userId, itemCreatingDto);
+    public ResponseEntity<Object> createItem(Long userId, ItemCreatingDto itemCreatingDto) {
+        return post("", userId, itemCreatingDto);
     }
 
-    public ResponseEntity<Object> getItemById(Long userId, Long itemId){
+    public ResponseEntity<Object> getItemById(Long itemId, Long userId) {
         return get("/" + itemId, userId);
     }
 
     public ResponseEntity<Object> updateItem(Long userId, Long itemId, ItemDto itemDto) {
-        return patch("/" + itemId,userId, itemDto);
+        return patch("/" + itemId, userId, itemDto);
     }
 
     public ResponseEntity<Object> getAllUserItems(int from, int size, Long userId) {
