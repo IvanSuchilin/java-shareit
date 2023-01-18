@@ -91,7 +91,7 @@ public class ItemService {
 
     public Collection<ItemDto> getAllUsersItems(Long userId, Pageable pageable) {
         log.debug("Получен запрос GET /items");
-        return itemRepository.findItemByOwnerId(userId, pageable)
+        return itemRepository.findItemByOwnerIdOrderById(userId, pageable)
                 .stream()
                 .map(this::createItemDtoWithBooking)
                 .collect(Collectors.toList());
