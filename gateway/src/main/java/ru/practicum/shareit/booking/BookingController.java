@@ -25,8 +25,8 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader(REQUEST_HEADER_SHARER) long userId,
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                              @Positive @RequestParam(name = "size", defaultValue = "20") Integer size) {
+                                              @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                              @Positive @RequestParam(defaultValue = "20") Integer size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Получение всех бронирований со статусом {}, userId={}, from={}, size={} в gateway", stateParam, userId, from, size);
@@ -50,8 +50,8 @@ public class BookingController {
     @GetMapping("/owner")
     public ResponseEntity<Object> getAllToOwner(@RequestHeader(REQUEST_HEADER_SHARER) Long userId,
                                                 @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                @Positive @RequestParam(name = "size", defaultValue = "20") Integer size) {
+                                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                @Positive @RequestParam(defaultValue = "20") Integer size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Получение бронирований владельцем {}, userId={}, from={}, size={} в gateway", stateParam, userId, from, size);
